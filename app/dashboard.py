@@ -32,7 +32,7 @@ def main_dashboard():
             return basic_dashboard()
     except Exception as e:
         log_activity(current_user.id, 'error', f'Dashboard error: {str(e)}')
-        return render_template('dashboard/error.html')
+        return render_template('errors/500.html')
 
 
 @dashboard_bp.route('/hr')
@@ -60,7 +60,7 @@ def hr_dashboard():
                              position_analytics=position_analytics)
     except Exception as e:
         log_activity(current_user.id, 'error', f'HR dashboard error: {str(e)}')
-        return render_template('dashboard/error.html')
+        return render_template('errors/500.html')
 
 
 @dashboard_bp.route('/admin')
@@ -98,7 +98,7 @@ def admin_dashboard():
         return render_template('dashboard/admin.html', data=data)
     except Exception as e:
         log_activity(current_user.id, 'error', f'Admin dashboard error: {str(e)}')
-        return render_template('dashboard/error.html')
+        return render_template('errors/500.html')
 
 
 @dashboard_bp.route('/executive')
@@ -121,7 +121,7 @@ def executive_dashboard():
                              compensation_data=compensation_data)
     except Exception as e:
         log_activity(current_user.id, 'error', f'Executive dashboard error: {str(e)}')
-        return render_template('dashboard/error.html')
+        return render_template('errors/500.html')
 
 
 @dashboard_bp.route('/interviewer')
@@ -144,7 +144,7 @@ def interviewer_dashboard():
                              evaluation_history=evaluation_history)
     except Exception as e:
         log_activity(current_user.id, 'error', f'Interviewer dashboard error: {str(e)}')
-        return render_template('dashboard/error.html')
+        return render_template('errors/500.html')
 
 
 @dashboard_bp.route('/api/pipeline-data')
@@ -661,4 +661,4 @@ def basic_dashboard():
         return render_template('dashboard/basic_dashboard.html')
     except Exception as e:
         log_activity(current_user.id, 'error', f'Basic dashboard error: {str(e)}')
-        return render_template('dashboard/error.html') 
+        return render_template('errors/500.html')
