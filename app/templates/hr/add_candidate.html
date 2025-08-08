@@ -1,3 +1,25 @@
+{% extends 'layouts/base.html' %}
+{% block title %}HR - Thêm ứng viên{% endblock %}
+{% block content %}
+  <h1 class="h4 mb-3">Thêm ứng viên</h1>
+  <form method="post" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="row g-3">
+      <div class="col-md-4"><label class="form-label">Họ</label>{{ form.last_name(class_='form-control') }}</div>
+      <div class="col-md-4"><label class="form-label">Tên</label>{{ form.first_name(class_='form-control') }}</div>
+      <div class="col-md-4"><label class="form-label">Email</label>{{ form.email(class_='form-control') }}</div>
+      <div class="col-md-4"><label class="form-label">SĐT</label>{{ form.phone(class_='form-control') }}</div>
+      <div class="col-md-4"><label class="form-label">Vị trí</label>{{ form.position_id(class_='form-select') }}</div>
+      <div class="col-md-8"><label class="form-label">Ghi chú</label>{{ form.notes(class_='form-control') }}</div>
+      <div class="col-md-6"><label class="form-label">CV (pdf/doc/docx)</label>{{ form.cv_file(class_='form-control') }}</div>
+    </div>
+    <div class="mt-3">
+      {{ form.submit(class_='btn btn-primary') }}
+      <a class="btn btn-secondary" href="{{ url_for('hr.candidate_management') }}">Hủy</a>
+    </div>
+  </form>
+{% endblock %}
+
 {% extends "base.html" %}
 
 {% block title %}Add Candidate - Mekong Technology{% endblock %}

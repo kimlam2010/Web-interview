@@ -1,14 +1,88 @@
 {% extends 'layouts/base.html' %}
 {% block title %}Executive Dashboard{% endblock %}
 {% block content %}
+  <nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main_dashboard') }}">Dashboard</a></li>
+      <li class="breadcrumb-item active">Executive</li>
+    </ol>
+  </nav>
+
   <h1 class="h4 mb-3">Executive Dashboard</h1>
 
   <div class="row g-3 mb-4">
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tổng quyết định</div><div class="fs-4">{{ decision_analytics.total_decisions or 0 }}</div></div></div></div>
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Hoàn tất</div><div class="fs-4">{{ decision_analytics.completed_decisions or 0 }}</div></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tổng quyết định</div><div class="fs-4">{{ (decision_analytics.total_decisions or 0) }}</div></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Hoàn tất</div><div class="fs-4">{{ (decision_analytics.completed_decisions or 0) }}</div></div></div></div>
     <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tỉ lệ Hire</div><div class="fs-4">{{ '%.1f' % (decision_analytics.hire_rate or 0) }}%</div></div></div></div>
-    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Phê duyệt lương</div><div class="fs-4">{{ compensation_data.compensation_approvals or 0 }}</div></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Phê duyệt lương</div><div class="fs-4">{{ (compensation_data.compensation_approvals or 0) }}</div></div></div></div>
   </div>
+
+  <div class="row g-3">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">Tỉ lệ quyết định theo loại</div>
+        <div class="card-body"><canvas id="decisionChart" height="120"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">Tình trạng phê duyệt lương</div>
+        <div class="card-body"><canvas id="compensationChart" height="120"></canvas></div>
+      </div>
+    </div>
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-header">Hire theo tháng (12 tháng gần nhất)</div>
+        <div class="card-body"><canvas id="monthlyHireChart" height="90"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    (function(){
+      var dec = {{ (decision_analytics or {}) | tojson }};
+      var comp = {{ (compensation_data or {}) | tojson }};
+      var monthly = {{ (monthly_hires or {}) | tojson }};
+
+      var ctx1 = document.getElementById('decisionChart').getContext('2d');
+      new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+          labels: ['hire','reject','review'],
+          datasets: [{
+            data: [dec.hire_count||0, dec.reject_count||0, dec.review_count||0],
+            backgroundColor: ['#198754','#dc3545','#ffc107']
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      var ctx2 = document.getElementById('compensationChart').getContext('2d');
+      new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['Approved','Pending','Rejected'],
+          datasets: [{
+            label: 'Số lượng',
+            data: [comp.approved||0, comp.pending||0, comp.rejected||0],
+            backgroundColor: '#0d6efd66'
+          }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true }}}
+      });
+
+      var ctx3 = document.getElementById('monthlyHireChart').getContext('2d');
+      new Chart(ctx3, {
+        type: 'line',
+        data: {
+          labels: monthly.labels || [],
+          datasets: [{ label: 'Hires', data: monthly.values || [], borderColor: '#198754', backgroundColor: '#19875433', tension: 0.3 }]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: true }}}
+      });
+    })();
+  </script>
 {% endblock %}
 
 

@@ -1,5 +1,5 @@
 {% extends 'layouts/base.html' %}
-{% block title %}Interviewer Dashboard{% endblock %}
+{% block title %}Bảng điều khiển Interviewer{% endblock %}
 {% block content %}
     <h1 class="h4 mb-3">Interviewer Dashboard</h1>
 
@@ -19,47 +19,161 @@
       <div class="col-md-3">
         <div class="card"><div class="card-body">
           <div class="text-muted small">Điểm TB</div>
-          <div class="fs-4">{{ '%.1f' % (interviewer_metrics.avg_score or 0) }}</div>
+          <div class="fs-4">{{ '%.2f' % (interviewer_metrics.avg_score or 0) }}</div>
         </div></div>
       </div>
     </div>
 
-    <h5>Đã phân công</h5>
-    <div class="table-responsive mb-4">
-      <table class="table table-sm table-striped">
-        <thead><tr><th>Ứng viên</th><th>Giai đoạn</th><th>Ngày</th></tr></thead>
-        <tbody>
-          {% for ev in assigned_interviews %}
-          <tr>
-            <td>{{ ev.candidate.get_full_name() if ev.candidate else '-' }}</td>
-            <td>{{ ev.step }}</td>
-            <td>{{ ev.created_at }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="3" class="text-center text-muted">Không có mục</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="row g-3">
+      <div class="col-lg-6">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Đã phân công</h5>
+          <div class="input-group input-group-sm" style="max-width: 260px;">
+            <span class="input-group-text">Tìm</span>
+            <input id="assigned-search" type="text" class="form-control" placeholder="Ứng viên / email / vị trí">
+          </div>
+        </div>
+        <div class="table-responsive mb-2">
+          <table class="table table-sm table-striped" id="assigned-table">
+            <thead>
+              <tr>
+                <th>Ứng viên</th>
+                <th>Vị trí</th>
+                <th>Giai đoạn</th>
+                <th>Ngày</th>
+              </tr>
+            </thead>
+            <tbody id="assigned-body">
+              <tr><td colspan="4" class="text-center text-muted">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted" id="assigned-total"></small>
+          <div>
+            <button class="btn btn-sm btn-outline-secondary" id="assigned-prev">Trước</button>
+            <button class="btn btn-sm btn-outline-secondary" id="assigned-next">Sau</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6">
+        <div class="d-flex align-items-center justify-content-between mb-2">
+          <h5 class="mb-0">Lịch sử đánh giá</h5>
+          <div class="d-flex gap-2">
+            <input id="history-from" type="date" class="form-control form-control-sm"/>
+            <input id="history-to" type="date" class="form-control form-control-sm"/>
+            <div class="input-group input-group-sm" style="max-width: 220px;">
+              <span class="input-group-text">Tìm</span>
+              <input id="history-search" type="text" class="form-control" placeholder="Ứng viên / email / vị trí">
+            </div>
+          </div>
+        </div>
+        <div class="table-responsive mb-2">
+          <table class="table table-sm table-striped" id="history-table">
+            <thead>
+              <tr>
+                <th>Ứng viên</th>
+                <th>Điểm</th>
+                <th>Khuyến nghị</th>
+                <th>Ngày</th>
+              </tr>
+            </thead>
+            <tbody id="history-body">
+              <tr><td colspan="4" class="text-center text-muted">Đang tải...</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <small class="text-muted" id="history-total"></small>
+          <div>
+            <button class="btn btn-sm btn-outline-secondary" id="history-prev">Trước</button>
+            <button class="btn btn-sm btn-outline-secondary" id="history-next">Sau</button>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <h5>Lịch sử đánh giá</h5>
-    <div class="table-responsive">
-      <table class="table table-sm table-striped">
-        <thead><tr><th>Ứng viên</th><th>Điểm</th><th>Khuyến nghị</th><th>Ngày</th></tr></thead>
-        <tbody>
-          {% for ev in evaluation_history %}
-          <tr>
-            <td>{{ ev.candidate.get_full_name() if ev.candidate else '-' }}</td>
-            <td>{{ ev.score }}</td>
-            <td>{{ ev.recommendation or '-' }}</td>
-            <td>{{ ev.created_at }}</td>
-          </tr>
-          {% else %}
-          <tr><td colspan="4" class="text-center text-muted">Không có mục</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+    <script>
+      (function() {
+        const state = {
+          assigned: { page: 1, size: 10, search: '' },
+          history: { page: 1, size: 10, search: '', from: '', to: '' }
+        };
+
+        const fmtDateTime = (iso) => {
+          if (!iso) return '-';
+          try { const d = new Date(iso); return d.toLocaleString(); } catch { return iso; }
+        };
+
+        const fetchAssigned = () => {
+          const params = new URLSearchParams({
+            page: state.assigned.page, size: state.assigned.size, search: state.assigned.search
+          });
+          fetch(`/dashboard/interviewer/assigned.json?${params}`)
+            .then(r => r.json()).then(data => {
+              const body = document.getElementById('assigned-body');
+              if (!data.items || data.items.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Không có mục</td></tr>';
+              } else {
+                body.innerHTML = data.items.map(it => `
+                  <tr>
+                    <td>${it.candidate_name}</td>
+                    <td>${it.position}</td>
+                    <td>${it.step}</td>
+                    <td>${fmtDateTime(it.created_at)}</td>
+                  </tr>
+                `).join('');
+              }
+              document.getElementById('assigned-total').textContent = `Tổng: ${data.total}`;
+            }).catch(() => {
+              document.getElementById('assigned-body').innerHTML = '<tr><td colspan="4" class="text-center text-danger">Lỗi tải dữ liệu</td></tr>';
+            });
+        };
+
+        const fetchHistory = () => {
+          const params = new URLSearchParams({
+            page: state.history.page, size: state.history.size, search: state.history.search,
+            from: state.history.from || '', to: state.history.to || ''
+          });
+          fetch(`/dashboard/interviewer/history.json?${params}`)
+            .then(r => r.json()).then(data => {
+              const body = document.getElementById('history-body');
+              if (!data.items || data.items.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" class="text-center text-muted">Không có mục</td></tr>';
+              } else {
+                body.innerHTML = data.items.map(it => `
+                  <tr>
+                    <td>${it.candidate_name}</td>
+                    <td>${it.score ?? '-'}</td>
+                    <td title="${it.recommendation || ''}">${it.recommendation || '-'}</td>
+                    <td>${fmtDateTime(it.created_at)}</td>
+                  </tr>
+                `).join('');
+              }
+              document.getElementById('history-total').textContent = `Tổng: ${data.total}`;
+            }).catch(() => {
+              document.getElementById('history-body').innerHTML = '<tr><td colspan="4" class="text-center text-danger">Lỗi tải dữ liệu</td></tr>';
+            });
+        };
+
+        // Events
+        document.getElementById('assigned-prev').onclick = () => { state.assigned.page = Math.max(1, state.assigned.page - 1); fetchAssigned(); };
+        document.getElementById('assigned-next').onclick = () => { state.assigned.page += 1; fetchAssigned(); };
+        document.getElementById('history-prev').onclick = () => { state.history.page = Math.max(1, state.history.page - 1); fetchHistory(); };
+        document.getElementById('history-next').onclick = () => { state.history.page += 1; fetchHistory(); };
+
+        const debounce = (fn, t=300)=>{ let id; return (...a)=>{ clearTimeout(id); id=setTimeout(()=>fn(...a), t);} };
+        document.getElementById('assigned-search').addEventListener('input', debounce((e)=>{ state.assigned.search=e.target.value; state.assigned.page=1; fetchAssigned(); }));
+        document.getElementById('history-search').addEventListener('input', debounce((e)=>{ state.history.search=e.target.value; state.history.page=1; fetchHistory(); }));
+        document.getElementById('history-from').addEventListener('change', (e)=>{ state.history.from=e.target.value; state.history.page=1; fetchHistory(); });
+        document.getElementById('history-to').addEventListener('change', (e)=>{ state.history.to=e.target.value; state.history.page=1; fetchHistory(); });
+
+        // Initial load
+        fetchAssigned();
+        fetchHistory();
+      })();
+    </script>
 {% endblock %}
 
 

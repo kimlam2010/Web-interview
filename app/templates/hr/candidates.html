@@ -1,7 +1,92 @@
-{% extends "base.html" %}
+{% extends 'layouts/base.html' %}
+{% block title %}HR - Ứng viên{% endblock %}
+{% block content %}
+  <h1 class="h4 mb-3">Danh sách ứng viên</h1>
+  <form class="row g-2 mb-3" method="get">
+    <div class="col-md-3"><input class="form-control" name="search_term" value="{{ search_term or '' }}" placeholder="Tìm tên/email/điện thoại"/></div>
+    <div class="col-md-3">
+      <select class="form-select" name="position_filter">
+        <option value="">-- Tất cả vị trí --</option>
+        {% for p in positions %}
+        <option value="{{ p.id }}" {% if position_filter|int == p.id %}selected{% endif %}>{{ p.title }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select class="form-select" name="status_filter">
+        <option value="">-- Trạng thái --</option>
+        {% for s in ['pending','step1_completed','step2_completed','hired','rejected'] %}
+        <option value="{{ s }}" {% if status_filter==s %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><input class="form-control" name="date_from" value="{{ date_from or '' }}" placeholder="From (YYYY-MM-DD)"/></div>
+    <div class="col-md-2"><input class="form-control" name="date_to" value="{{ date_to or '' }}" placeholder="To (YYYY-MM-DD)"/></div>
+    <div class="col-md-2"><button class="btn btn-outline-secondary w-100">Lọc</button></div>
+  </form>
 
-{% block title %}Candidate Management - Mekong Technology{% endblock %}
+  <div class="mb-3">
+    <a href="{{ url_for('hr.add_candidate') }}" class="btn btn-primary btn-sm">+ Thêm ứng viên</a>
+    <a href="{{ url_for('hr.export_candidates_csv', search_term=search_term, position_filter=position_filter, status_filter=status_filter, date_from=date_from, date_to=date_to) }}" class="btn btn-outline-secondary btn-sm">Export CSV</a>
+    <form method="post" action="{{ url_for('hr.import_candidates_csv') }}" enctype="multipart/form-data" class="d-inline ms-2">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="file" name="file" accept=".csv" class="form-control form-control-sm d-inline" style="width:240px; display:inline-block" />
+      <button class="btn btn-outline-primary btn-sm">Import CSV</button>
+    </form>
+  </div>
 
+  <div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+      <thead><tr><th>#</th><th>Tên</th><th>Email</th><th>Điện thoại</th><th>Vị trí</th><th>Trạng thái</th><th class="text-end">Hành động</th></tr></thead>
+      <tbody>
+        {% for c in candidates.items %}
+        <tr>
+          <td>{{ c.id }}</td>
+          <td>{{ c.get_full_name() }}</td>
+          <td>{{ c.email }}</td>
+          <td>{{ c.phone }}</td>
+          <td>{{ c.position.title if c.position else '-' }}</td>
+          <td>{{ c.status }}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('hr.edit_candidate', candidate_id=c.id) }}">Sửa</a>
+            <a class="btn btn-sm btn-outline-info" href="{{ url_for('hr.schedule_interview', candidate_id=c.id) }}">Lên lịch</a>
+            <form method="post" action="{{ url_for('hr.generate_step1_link', candidate_id=c.id) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button class="btn btn-sm btn-outline-success">Gửi Step1</button>
+            </form>
+            <form method="post" action="{{ url_for('hr.send_step3_invite', candidate_id=c.id) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button class="btn btn-sm btn-outline-warning">Gửi lại Step3</button>
+            </form>
+            <form method="post" action="{{ url_for('hr.delete_candidate', candidate_id=c.id) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Xóa ứng viên?')">Xóa</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted">Chưa có ứng viên</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if candidates.pages > 1 %}
+  <nav>
+    <ul class="pagination">
+      <li class="page-item {% if not candidates.has_prev %}disabled{% endif %}"><a class="page-link" href="?page={{ candidates.prev_num }}&search_term={{ search_term }}&position_filter={{ position_filter }}&status_filter={{ status_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">«</a></li>
+      {% for p in candidates.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+          <li class="page-item {% if p == candidates.page %}active{% endif %}"><a class="page-link" href="?page={{ p }}&search_term={{ search_term }}&position_filter={{ position_filter }}&status_filter={{ status_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">{{ p }}</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+      {% endfor %}
+      <li class="page-item {% if not candidates.has_next %}disabled{% endif %}"><a class="page-link" href="?page={{ candidates.next_num }}&search_term={{ search_term }}&position_filter={{ position_filter }}&status_filter={{ status_filter }}&date_from={{ date_from }}&date_to={{ date_to }}">»</a></li>
+    </ul>
+  </nav>
+  {% endif %}
+{% endblock %}
 {% block content %}
 <div class="container-fluid">
     <!-- Header -->

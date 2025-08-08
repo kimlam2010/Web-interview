@@ -1,33 +1,32 @@
 {% extends 'layouts/base.html' %}
-{% block title %}HR Dashboard{% endblock %}
+{% block title %}Dashboard HR{% endblock %}
 {% block content %}
-  <h1 class="h4 mb-3">HR Dashboard</h1>
-
-  <div class="row g-3 mb-4">
-    <div class="col-md-2"><div class="card"><div class="card-body"><div class="text-muted small">Tổng</div><div class="fs-4">{{ pipeline_data.total }}</div></div></div></div>
-    <div class="col-md-2"><div class="card"><div class="card-body"><div class="text-muted small">Pending</div><div class="fs-5">{{ pipeline_data.pending.count }}</div></div></div></div>
-    <div class="col-md-2"><div class="card"><div class="card-body"><div class="text-muted small">Step1</div><div class="fs-5">{{ pipeline_data.step1_completed.count }}</div></div></div></div>
-    <div class="col-md-2"><div class="card"><div class="card-body"><div class="text-muted small">Step2</div><div class="fs-5">{{ pipeline_data.step2_completed.count }}</div></div></div></div>
-    <div class="col-md-2"><div class="card"><div class="card-body"><div class="text-muted small">Hired</div><div class="fs-5">{{ pipeline_data.hired.count if pipeline_data.hired else 0 }}</div></div></div></div>
-    <div class="col-md-2"><div class="card"><div class="card-body"><div class="text-muted small">Rejected</div><div class="fs-5">{{ pipeline_data.rejected.count }}</div></div></div></div>
-  </div>
-
-  <div class="card mb-4">
-    <div class="card-header">Ứng viên mới</div>
-    <div class="card-body p-0">
-      <div class="table-responsive">
-        <table class="table table-sm table-striped mb-0"><thead><tr><th>Tên</th><th>Email</th><th>Trạng thái</th></tr></thead>
-          <tbody>
-            {% for c in recent_activities.recent_candidates %}
-            <tr><td>{{ c.get_full_name() }}</td><td>{{ c.email }}</td><td>{{ c.status }}</td></tr>
-            {% else %}
-            <tr><td colspan="3" class="text-center text-muted">Không có mục</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+  <nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main_dashboard') }}">Dashboard</a></li>
+      <li class="breadcrumb-item active">HR</li>
+    </ol>
+  </nav>
+  <div class="row g-3">
+    <div class="col-md-3">
+      <div class="card"><div class="card-body"><div class="text-muted">Tổng ứng viên</div><div class="fs-4 fw-bold">{{ pipeline_data.total if pipeline_data and pipeline_data.total else 0 }}</div></div></div>
+    </div>
+    <div class="col-md-9">
+      <canvas id="pipelineChart" height="80"></canvas>
     </div>
   </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+  (function(){
+    var data = {{ (pipeline_data or {}) | tojson }};
+    var ctx = document.getElementById('pipelineChart').getContext('2d');
+    var labels = ['pending','step1_completed','step2_completed','hired','rejected'];
+    var values = labels.map(l => (data[l]||0));
+    new Chart(ctx, {
+      type: 'bar',
+      data: { labels: labels, datasets: [{ label: 'Pipeline', data: values, backgroundColor: '#0d6efd66' }] },
+      options: { responsive: true, scales: { y: { beginAtZero: true }}}
+    });
+  })();
+  </script>
 {% endblock %}
-
-

@@ -35,6 +35,10 @@ def permission_required(permission: str) -> Callable:
             if not current_user.is_authenticated:
                 return redirect(url_for('auth.login'))
             
+            # Admin luôn có toàn quyền
+            if getattr(current_user, 'role', None) == 'admin':
+                return f(*args, **kwargs)
+
             if not current_user.has_permission(permission):
                 # Log unauthorized access attempt
                 log_audit_event(
@@ -73,7 +77,8 @@ def role_required(role: str) -> Callable:
             if not current_user.is_authenticated:
                 return redirect(url_for('auth.login'))
             
-            if current_user.role != role:
+            # Admin luôn có toàn quyền
+            if current_user.role != role and current_user.role != 'admin':
                 # Log unauthorized access attempt
                 log_audit_event(
                     user_id=current_user.id,
@@ -198,6 +203,10 @@ def validate_resource_access(resource_type: str, resource_id_param: str = 'id') 
             if not resource_id:
                 abort(400, description="Resource ID not provided")
             
+            # Admin luôn có toàn quyền
+            if getattr(current_user, 'role', None) == 'admin':
+                return f(*args, **kwargs)
+
             # Validate access based on resource type
             if resource_type == 'candidate':
                 from .models import Candidate

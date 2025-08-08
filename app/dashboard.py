@@ -9,7 +9,8 @@ from datetime import datetime, timedelta
 import json
 
 from .models import db, Candidate, Position, AssessmentResult, InterviewEvaluation, ExecutiveDecision, User
-from .decorators import hr_required, admin_required
+from .decorators import hr_required, admin_required, interviewer_required
+from sqlalchemy.orm import joinedload
 from app.utils import log_activity
 
 dashboard_bp = Blueprint('dashboard', __name__)
@@ -114,11 +115,14 @@ def executive_dashboard():
         
         # Get compensation data
         compensation_data = get_compensation_data()
+        # Monthly hires data for mini-chart
+        monthly_hires = get_monthly_hires_series()
         
         return render_template('dashboard/executive_dashboard.html',
                              executive_metrics=executive_metrics,
                              decision_analytics=decision_analytics,
-                             compensation_data=compensation_data)
+                              compensation_data=compensation_data,
+                              monthly_hires=monthly_hires)
     except Exception as e:
         log_activity(current_user.id, 'error', f'Executive dashboard error: {str(e)}')
         return render_template('errors/500.html')
@@ -126,6 +130,7 @@ def executive_dashboard():
 
 @dashboard_bp.route('/interviewer')
 @login_required
+@interviewer_required
 def interviewer_dashboard():
     """Interviewer-specific dashboard."""
     try:
@@ -138,14 +143,150 @@ def interviewer_dashboard():
         # Get evaluation history
         evaluation_history = get_evaluation_history()
         
-        return render_template('dashboard/interviewer_dashboard.html',
-                             interviewer_metrics=interviewer_metrics,
-                             assigned_interviews=assigned_interviews,
-                             evaluation_history=evaluation_history)
+        return render_template(
+            'dashboard/interviewer_dashboard.html',
+            interviewer_metrics=interviewer_metrics,
+            assigned_interviews=assigned_interviews,
+            evaluation_history=evaluation_history,
+        )
     except Exception as e:
         log_activity(current_user.id, 'error', f'Interviewer dashboard error: {str(e)}')
         return render_template('errors/500.html')
 
+
+@dashboard_bp.route('/interviewer/assigned.json')
+@login_required
+@interviewer_required
+def interviewer_assigned_json():
+    """API: danh sách nhiệm vụ đã phân công cho interviewer (chưa hoàn tất)."""
+    try:
+        search = (request.args.get('search') or '').strip()
+        page = max(int(request.args.get('page', 1)), 1)
+        size = min(max(int(request.args.get('size', 10)), 1), 50)
+
+        base_query = (
+            InterviewEvaluation.query.options(
+                joinedload(InterviewEvaluation.candidate).joinedload(Candidate.position)
+            )
+            .filter(
+                InterviewEvaluation.interviewer_id == current_user.id,
+                InterviewEvaluation.recommendation.is_(None),
+            )
+            .order_by(InterviewEvaluation.created_at.desc())
+        )
+
+        if search:
+            like = f"%{search.lower()}%"
+            base_query = base_query.join(Candidate).join(Position).filter(
+                db.or_(
+                    db.func.lower(Candidate.first_name).like(like),
+                    db.func.lower(Candidate.last_name).like(like),
+                    db.func.lower(Candidate.email).like(like),
+                    db.func.lower(Position.title).like(like),
+                )
+            )
+
+        total = base_query.count()
+        items = (
+            base_query.offset((page - 1) * size).limit(size).all()
+        )
+
+        def to_item(ev: InterviewEvaluation):
+            candidate = ev.candidate
+            position = candidate.position if candidate else None
+            return {
+                'id': ev.id,
+                'candidate_name': candidate.get_full_name() if candidate else '-',
+                'candidate_email': candidate.email if candidate else '-',
+                'position': position.title if position else '-',
+                'step': ev.step,
+                'created_at': ev.created_at.isoformat() if ev.created_at else None,
+            }
+
+        return jsonify({
+            'items': [to_item(ev) for ev in items],
+            'page': page,
+            'total': total,
+            'page_size': size,
+        })
+    except Exception as e:
+        log_activity(current_user.id, 'error', f'Assigned JSON error: {str(e)}')
+        return jsonify({'error': str(e)}), 500
+
+
+@dashboard_bp.route('/interviewer/history.json')
+@login_required
+@interviewer_required
+def interviewer_history_json():
+    """API: lịch sử đánh giá của interviewer (đã hoàn tất)."""
+    try:
+        search = (request.args.get('search') or '').strip()
+        page = max(int(request.args.get('page', 1)), 1)
+        size = min(max(int(request.args.get('size', 10)), 1), 50)
+        from_date = request.args.get('from')
+        to_date = request.args.get('to')
+
+        base_query = (
+            InterviewEvaluation.query.options(
+                joinedload(InterviewEvaluation.candidate).joinedload(Candidate.position)
+            )
+            .filter(
+                InterviewEvaluation.interviewer_id == current_user.id,
+                InterviewEvaluation.recommendation.isnot(None),
+            )
+            .order_by(InterviewEvaluation.created_at.desc())
+        )
+
+        if from_date:
+            try:
+                dt_from = datetime.fromisoformat(from_date)
+                base_query = base_query.filter(InterviewEvaluation.created_at >= dt_from)
+            except Exception:
+                pass
+        if to_date:
+            try:
+                dt_to = datetime.fromisoformat(to_date)
+                base_query = base_query.filter(InterviewEvaluation.created_at <= dt_to)
+            except Exception:
+                pass
+
+        if search:
+            like = f"%{search.lower()}%"
+            base_query = base_query.join(Candidate).join(Position).filter(
+                db.or_(
+                    db.func.lower(Candidate.first_name).like(like),
+                    db.func.lower(Candidate.last_name).like(like),
+                    db.func.lower(Candidate.email).like(like),
+                    db.func.lower(Position.title).like(like),
+                )
+            )
+
+        total = base_query.count()
+        items = (
+            base_query.offset((page - 1) * size).limit(size).all()
+        )
+
+        def to_item(ev: InterviewEvaluation):
+            candidate = ev.candidate
+            position = candidate.position if candidate else None
+            return {
+                'id': ev.id,
+                'candidate_name': candidate.get_full_name() if candidate else '-',
+                'position': position.title if position else '-',
+                'score': ev.score,
+                'recommendation': ev.recommendation,
+                'created_at': ev.created_at.isoformat() if ev.created_at else None,
+            }
+
+        return jsonify({
+            'items': [to_item(ev) for ev in items],
+            'page': page,
+            'total': total,
+            'page_size': size,
+        })
+    except Exception as e:
+        log_activity(current_user.id, 'error', f'History JSON error: {str(e)}')
+        return jsonify({'error': str(e)}), 500
 
 @dashboard_bp.route('/api/pipeline-data')
 @login_required
@@ -503,6 +644,31 @@ def get_compensation_data():
         return {}
 
 
+def get_monthly_hires_series():
+    """Aggregate hires theo tháng trong 12 tháng gần nhất."""
+    try:
+        from datetime import date
+        # Giả định Decision.completed_at là ngày hoàn tất; fallback created_at nếu không có
+        rows = db.session.query(
+            db.func.strftime('%Y-%m', ExecutiveDecision.completed_at),
+            db.func.count(ExecutiveDecision.id)
+        ).filter(
+            ExecutiveDecision.status == 'completed',
+            ExecutiveDecision.final_decision == 'hire',
+            ExecutiveDecision.completed_at.isnot(None)
+        ).group_by(db.func.strftime('%Y-%m', ExecutiveDecision.completed_at)).order_by(db.func.strftime('%Y-%m', ExecutiveDecision.completed_at)).all()
+
+        labels = []
+        values = []
+        for ym, cnt in rows:
+            labels.append(ym or '')
+            values.append(int(cnt or 0))
+        return { 'labels': labels, 'values': values }
+    except Exception as e:
+        log_activity(current_user.id, 'error', f'Monthly hires series error: {str(e)}')
+        return { 'labels': [], 'values': [] }
+
+
 def get_interviewer_metrics():
     """Get interviewer-specific metrics."""
     try:
@@ -511,7 +677,7 @@ def get_interviewer_metrics():
         
         total_evaluations = len(evaluations)
         completed_evaluations = len([e for e in evaluations if e.recommendation is not None])
-        avg_score = sum((e.score or 0) for e in evaluations) / len(evaluations) if evaluations else 0
+        avg_score = round((sum((e.score or 0) for e in evaluations) / len(evaluations)) if evaluations else 0, 2)
         
         return {
             'total_evaluations': total_evaluations,

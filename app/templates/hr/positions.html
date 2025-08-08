@@ -1,0 +1,87 @@
+{% extends 'layouts/base.html' %}
+{% block title %}HR - Vị trí tuyển dụng{% endblock %}
+{% block content %}
+  <nav aria-label="breadcrumb" class="mb-2">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{ url_for('dashboard.main_dashboard') }}">Dashboard</a></li>
+      <li class="breadcrumb-item active">Vị trí</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h4 mb-0">Vị trí tuyển dụng</h1>
+    <a class="btn btn-primary btn-sm" href="{{ url_for('hr.create_position') }}">+ Tạo vị trí</a>
+  </div>
+
+  <form class="row g-2 mb-3">
+    <div class="col-md-3">
+      <select class="form-select" name="department">
+        <option value="">Phòng ban</option>
+        {% for d in departments %}
+        <option value="{{ d }}" {% if filters.department==d %}selected{% endif %}>{{ d.title() }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" name="level">
+        <option value="">Cấp bậc</option>
+        {% for l in levels %}
+        <option value="{{ l }}" {% if filters.level==l %}selected{% endif %}>{{ l.title() }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" name="active">
+        <option value="">Trạng thái</option>
+        <option value="true" {% if filters.active=='true' %}selected{% endif %}>Đang tuyển</option>
+        <option value="false" {% if filters.active=='false' %}selected{% endif %}>Tạm dừng</option>
+      </select>
+    </div>
+    <div class="col-md-3"><button class="btn btn-outline-secondary w-100">Lọc</button></div>
+  </form>
+
+  <div class="table-responsive">
+    <table class="table table-sm table-striped align-middle">
+      <thead><tr><th>#</th><th>Chức danh</th><th>Phòng ban</th><th>Cấp bậc</th><th>Lương (min-max)</th><th>Trạng thái</th><th class="text-end">Hành động</th></tr></thead>
+      <tbody>
+        {% for p in positions.items %}
+        <tr>
+          <td>{{ p.id }}</td>
+          <td>{{ p.title }}</td>
+          <td>{{ p.department.title() }}</td>
+          <td>{{ p.level.title() }}</td>
+          <td>{% if p.salary_min %}{{ p.salary_min }} - {{ p.salary_max or '-' }}{% else %}-{% endif %}</td>
+          <td><span class="badge bg-{{ 'success' if p.is_active else 'secondary' }}">{{ 'Đang tuyển' if p.is_active else 'Tạm dừng' }}</span></td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('hr.edit_position', position_id=p.id) }}">Sửa</a>
+            <form method="post" action="{{ url_for('hr.toggle_position', position_id=p.id) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button class="btn btn-sm btn-outline-warning">{{ 'Tạm dừng' if p.is_active else 'Mở' }}</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted">Chưa có vị trí</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if positions.pages > 1 %}
+  <nav>
+    <ul class="pagination">
+      <li class="page-item {% if not positions.has_prev %}disabled{% endif %}"><a class="page-link" href="?page={{ positions.prev_num }}&department={{ filters.department }}&level={{ filters.level }}&active={{ filters.active }}">«</a></li>
+      {% for p in positions.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+        {% if p %}
+          <li class="page-item {% if p == positions.page %}active{% endif %}"><a class="page-link" href="?page={{ p }}&department={{ filters.department }}&level={{ filters.level }}&active={{ filters.active }}">{{ p }}</a></li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+      {% endfor %}
+      <li class="page-item {% if not positions.has_next %}disabled{% endif %}"><a class="page-link" href="?page={{ positions.next_num }}&department={{ filters.department }}&level={{ filters.level }}&active={{ filters.active }}">»</a></li>
+    </ul>
+  </nav>
+  {% endif %}
+{% endblock %}
+
+
