@@ -247,14 +247,15 @@ def get_performance_metrics():
     """Get performance metrics."""
     try:
         # Calculate pass rates
-        step1_results = AssessmentResult.query.filter_by(step=1).all()
+        step1_results = AssessmentResult.query.filter_by(step='step1').all()
         step1_passed = len([r for r in step1_results if r.percentage >= 70])
         step1_pass_rate = (step1_passed / len(step1_results) * 100) if step1_results else 0
         
-        # Step 2 pass rate
-        step2_evaluations = InterviewEvaluation.query.filter_by(status='completed').all()
-        step2_passed = len([e for e in step2_evaluations if e.overall_score >= 7])
-        step2_pass_rate = (step2_passed / len(step2_evaluations) * 100) if step2_evaluations else 0
+        # Step 2 pass rate (completed = có recommendation)
+        step2_evaluations = InterviewEvaluation.query.filter(InterviewEvaluation.step == 'step2').all()
+        completed_step2 = [e for e in step2_evaluations if e.recommendation is not None]
+        step2_passed = len([e for e in completed_step2 if (e.score or 0) >= 7])
+        step2_pass_rate = (step2_passed / len(completed_step2) * 100) if completed_step2 else 0
         
         # Executive decisions
         executive_decisions = ExecutiveDecision.query.filter_by(status='completed').all()
@@ -335,11 +336,11 @@ def get_system_statistics():
         pass_rate = (passed_assessments / total_assessments * 100) if total_assessments > 0 else 0
         
         # Get hired candidates (those with executive decisions)
-        hired_candidates = ExecutiveDecision.query.filter_by(status='approved').count()
+        hired_candidates = ExecutiveDecision.query.filter_by(status='completed', final_decision='hire').count()
         
         # Get pending candidates (those in assessment or interview stage)
         pending_candidates = Candidate.query.filter(
-            Candidate.status.in_(['assessment', 'interview', 'pending'])
+            Candidate.status.in_(['pending', 'step1_completed', 'step2_completed'])
         ).count()
         
         return {
@@ -509,8 +510,8 @@ def get_interviewer_metrics():
         evaluations = InterviewEvaluation.query.filter_by(interviewer_id=current_user.id).all()
         
         total_evaluations = len(evaluations)
-        completed_evaluations = len([e for e in evaluations if e.status == 'completed'])
-        avg_score = sum(e.overall_score for e in evaluations if e.overall_score) / len(evaluations) if evaluations else 0
+        completed_evaluations = len([e for e in evaluations if e.recommendation is not None])
+        avg_score = sum((e.score or 0) for e in evaluations) / len(evaluations) if evaluations else 0
         
         return {
             'total_evaluations': total_evaluations,
@@ -526,9 +527,9 @@ def get_interviewer_metrics():
 def get_assigned_interviews():
     """Get assigned interviews for interviewer."""
     try:
-        return InterviewEvaluation.query.filter_by(
-            interviewer_id=current_user.id,
-            status='scheduled'
+        return InterviewEvaluation.query.filter(
+            InterviewEvaluation.interviewer_id == current_user.id,
+            InterviewEvaluation.recommendation.is_(None)
         ).join(Candidate).all()
     except Exception as e:
         log_activity(current_user.id, 'error', f'Assigned interviews error: {str(e)}')
@@ -538,9 +539,9 @@ def get_assigned_interviews():
 def get_evaluation_history():
     """Get evaluation history for interviewer."""
     try:
-        return InterviewEvaluation.query.filter_by(
-            interviewer_id=current_user.id,
-            status='completed'
+        return InterviewEvaluation.query.filter(
+            InterviewEvaluation.interviewer_id == current_user.id,
+            InterviewEvaluation.recommendation.isnot(None)
         ).join(Candidate).order_by(InterviewEvaluation.created_at.desc()).limit(10).all()
     except Exception as e:
         log_activity(current_user.id, 'error', f'Evaluation history error: {str(e)}')
@@ -584,12 +585,13 @@ def calculate_pass_rates():
     """Calculate pass rates by step and position."""
     try:
         # Step 1 pass rates
-        step1_results = AssessmentResult.query.filter_by(step=1).all()
+        step1_results = AssessmentResult.query.filter_by(step='step1').all()
         step1_pass_rate = len([r for r in step1_results if r.percentage >= 70]) / len(step1_results) * 100 if step1_results else 0
         
         # Step 2 pass rates
-        step2_evaluations = InterviewEvaluation.query.filter_by(status='completed').all()
-        step2_pass_rate = len([e for e in step2_evaluations if e.overall_score >= 7]) / len(step2_evaluations) * 100 if step2_evaluations else 0
+        step2_evaluations = InterviewEvaluation.query.filter(InterviewEvaluation.step == 'step2').all()
+        completed_step2 = [e for e in step2_evaluations if e.recommendation is not None]
+        step2_pass_rate = (len([e for e in completed_step2 if (e.score or 0) >= 7]) / len(completed_step2) * 100) if completed_step2 else 0
         
         # Position-specific pass rates
         positions = Position.query.all()

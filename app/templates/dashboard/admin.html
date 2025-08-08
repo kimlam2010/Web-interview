@@ -74,9 +74,78 @@
                     </h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group me-2">
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
-                            <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                            <a href="{{ url_for('admin.system_config') }}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-gear"></i> Cấu hình hệ thống
+                            </a>
+                            <a href="{{ url_for('admin.users') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-user-shield"></i> Người dùng
+                            </a>
+                            <a href="{{ url_for('admin.audit_logs') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-clipboard-list"></i> Audit Logs
+                            </a>
+                            <a href="{{ url_for('questions.question_bank') }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-question"></i> Câu hỏi
+                            </a>
+                            <a href="{{ url_for('auth.logout') }}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-right-from-bracket"></i> Logout
+                            </a>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Quick Admin Actions -->
+                <div class="row mb-4">
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <a href="{{ url_for('admin.system_config') }}" class="text-decoration-none">
+                            <div class="card dashboard-card h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-gear fa-2x me-3 text-secondary"></i>
+                                    <div>
+                                        <div class="fw-bold">Cấu hình hệ thống</div>
+                                        <small class="text-muted">Thiết lập chung, bảo mật, email...</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <a href="{{ url_for('admin.users') }}" class="text-decoration-none">
+                            <div class="card dashboard-card h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-users-cog fa-2x me-3 text-secondary"></i>
+                                    <div>
+                                        <div class="fw-bold">Quản lý người dùng</div>
+                                        <small class="text-muted">Tạo/sửa quyền Admin, HR, Interviewer...</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <a href="{{ url_for('questions.question_bank') }}" class="text-decoration-none">
+                            <div class="card dashboard-card h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-folder-open fa-2x me-3 text-secondary"></i>
+                                    <div>
+                                        <div class="fw-bold">Ngân hàng câu hỏi</div>
+                                        <small class="text-muted">Step 1/2/3, import/export, kích hoạt...</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-xl-3 col-md-6 mb-4">
+                        <a href="{{ url_for('admin.audit_logs') }}" class="text-decoration-none">
+                            <div class="card dashboard-card h-100">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-clipboard-list fa-2x me-3 text-secondary"></i>
+                                    <div>
+                                        <div class="fw-bold">Nhật ký hệ thống</div>
+                                        <small class="text-muted">Theo dõi hành động, bảo mật, sự kiện</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
                 </div>
 
