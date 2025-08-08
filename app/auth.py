@@ -138,9 +138,13 @@ def login():
                 else:
                     # Increment failed login attempts
                     if user:
+                        # Chính sách từ SECURITY_POLICY
+                        policy = (current_app.config.get('SECURITY_POLICY') or {})
+                        max_attempts = int(policy.get('max_login_attempts', 3))
+                        lock_minutes = int(policy.get('lockout_minutes', 30))
                         user.login_attempts += 1
-                        if user.login_attempts >= 3:
-                            user.locked_until = datetime.utcnow() + timedelta(minutes=15)
+                        if user.login_attempts >= max_attempts:
+                            user.locked_until = datetime.utcnow() + timedelta(minutes=lock_minutes)
                         db.session.commit()
                     
                     flash('Tên đăng nhập hoặc mật khẩu không đúng.', 'error')

@@ -1,42 +1,123 @@
-<!doctype html>
-<html lang="vi">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Admin - Cấu hình hệ thống</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-</head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-    <div class="container-fluid">
-      <a class="navbar-brand" href="{{ url_for('admin.admin_dashboard') }}">Admin</a>
-      <div class="d-flex">
-        <a class="btn btn-sm btn-outline-light me-2" href="{{ url_for('admin.users') }}">Người dùng</a>
-        <a class="btn btn-sm btn-danger" href="{{ url_for('auth.logout') }}">Logout</a>
-      </div>
-    </div>
-  </nav>
-
-  <div class="container py-4">
+{% extends 'layouts/base.html' %}
+{% block title %}Cấu hình hệ thống{% endblock %}
+{% block content %}
     <h1 class="h4 mb-3">Cấu hình hệ thống</h1>
-    <div class="alert alert-warning">Trang mẫu. Sẽ ánh xạ các khóa trong `config.py` vào form.</div>
-    <form>
-      <div class="row g-3">
+    <ul class="nav nav-tabs mb-3" role="tablist">
+      <li class="nav-item"><a class="nav-link active" data-bs-toggle="tab" href="#general" role="tab">Chung</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#security" role="tab">Bảo mật</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#email" role="tab">Email</a></li>
+      <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#links" role="tab">Liên kết/Reminder</a></li>
+    </ul>
+
+    <form method="post" id="system-config-form">
+      {{ form.hidden_tag() }}
+      <div class="tab-content">
+        <div class="tab-pane fade show active" id="general" role="tabpanel">
+          <div class="row g-3">
         <div class="col-md-6">
           <label class="form-label">Tên công ty</label>
-          <input class="form-control" value="{{ COMPANY_NAME }}" />
+          {{ form.company_name(class_='form-control') }}
         </div>
         <div class="col-md-6">
           <label class="form-label">Logo URL</label>
-          <input class="form-control" value="{{ COMPANY_LOGO }}" />
+          {{ form.company_logo(class_='form-control', id='logoUrl') }}
+          <small class="text-muted">Xem trước:</small>
+          <div><img id="logoPreview" src="{{ COMPANY_LOGO }}" alt="logo" style="max-height:48px; margin-top:6px;"/></div>
+        </div>
+          <div class="col-md-4">
+          <label class="form-label">Session timeout (giờ)</label>
+          {{ form.session_timeout_hours(class_='form-control') }}
+          </div>
+          <div class="col-md-4">
+          <label class="form-label">Độ dài token link</label>
+          {{ form.token_length(class_='form-control') }}
+          </div>
+          <div class="col-md-4">
+          <label class="form-label">Hạn link Step1 (ngày)</label>
+          {{ form.step1_link_exp_days(class_='form-control') }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Hạn link Step2 (ngày)</label>
+            {{ form.step2_link_exp_days(class_='form-control') }}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Hạn link Step3 (ngày)</label>
+            {{ form.step3_link_exp_days(class_='form-control') }}
+          </div>
+        </div>
+        </div>
+
+        <div class="tab-pane fade" id="security" role="tabpanel">
+          <div class="row g-3">
+            <div class="col-12"><strong>Độ phức tạp mật khẩu ứng viên</strong></div>
+            <div class="col-md-3 form-check">{{ form.include_lowercase(class_='form-check-input', id='lc') }} <label for='lc' class='form-check-label'>Chữ thường</label></div>
+            <div class="col-md-3 form-check">{{ form.include_uppercase(class_='form-check-input', id='uc') }} <label for='uc' class='form-check-label'>Chữ hoa</label></div>
+            <div class="col-md-3 form-check">{{ form.include_numbers(class_='form-check-input', id='num') }} <label for='num' class='form-check-label'>Số</label></div>
+            <div class="col-md-3 form-check">{{ form.include_special(class_='form-check-input', id='sp') }} <label for='sp' class='form-check-label'>Ký tự đặc biệt</label></div>
+            <div class="col-12"><hr/></div>
+            <div class="col-md-6 form-check">{{ form.weekend_auto_extend(class_='form-check-input', id='wae') }} <label for='wae' class='form-check-label'>Tự động gia hạn nếu hết hạn vào cuối tuần</label></div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="email" role="tabpanel">
+          <div class="row g-3">
+            <div class="col-md-3"><label class="form-label">SMTP Host</label>{{ form.smtp_host(class_='form-control') }}</div>
+            <div class="col-md-2"><label class="form-label">Port</label>{{ form.smtp_port(class_='form-control') }}</div>
+            <div class="col-md-3"><label class="form-label">Username</label>{{ form.smtp_user(class_='form-control') }}</div>
+            <div class="col-md-3"><label class="form-label">Password</label>{{ form.smtp_pass(class_='form-control') }}</div>
+            <div class="col-md-2 d-flex align-items-end"><div class="form-check">{{ form.smtp_tls(class_='form-check-input', id='smtp_tls') }} <label for='smtp_tls' class='form-check-label'>TLS/SSL</label></div></div>
+            <div class="col-md-4"><label class="form-label">Sender</label>{{ form.smtp_sender(class_='form-control') }}</div>
+            <div class="col-md-4"><label class="form-label">Gửi email thử tới</label>{{ form.test_email_to(class_='form-control') }}</div>
+            <div class="col-md-12">
+              <form method="post" action="{{ url_for('admin.system_test_email') }}" class="d-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input type="hidden" name="test_email_to" value="{{ form.test_email_to.data or '' }}" />
+                <button class="btn btn-outline-primary">Gửi email thử</button>
+              </form>
+              <small class="text-muted ms-2">Lưu cấu hình trước khi gửi thử.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="tab-pane fade" id="links" role="tabpanel">
+          <div class="row g-3">
+            <div class="col-md-6"><label class="form-label">CORS allowed origins (CSV)</label>{{ form.cors_allowed_origins(class_='form-control') }}</div>
+            <div class="col-md-6 d-flex align-items-end"><div class="form-check">{{ form.enable_candidate_signup(class_='form-check-input', id='signup') }} <label for='signup' class='form-check-label'>Cho phép đăng ký ứng viên</label></div></div>
+            <div class="col-12"><hr/></div>
+            <div class="col-md-4"><a href="{{ url_for('admin.export_system_config') }}" class="btn btn-outline-secondary">Export cấu hình</a></div>
+            <div class="col-md-8">
+              <form method="post" action="{{ url_for('admin.import_system_config') }}" enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <div class="input-group">
+                  <input type="file" class="form-control" name="config_file" accept="application/json" />
+                  <button class="btn btn-outline-primary">Import</button>
+                </div>
+              </form>
+            </div>
+            <div class="col-12 mt-3"><a class="btn btn-sm btn-outline-info" href="{{ url_for('admin.system_config_history') }}">Xem lịch sử</a></div>
+          </div>
         </div>
       </div>
-      <div class="mt-3">
-        <button class="btn btn-primary" disabled>Lưu (demo)</button>
+      <div class="mt-3 d-flex gap-2">
+        {{ form.submit(class_='btn btn-primary') }}
+        <a class="btn btn-outline-secondary" href="{{ url_for('admin.system_config') }}?reset=1" onclick="return confirm('Khôi phục mặc định?')">Khôi phục mặc định</a>
+        <a class="btn btn-outline-success" href="{{ url_for('admin.token_sample') }}" target="_blank">Tạo mã token mẫu</a>
       </div>
     </form>
-  </div>
-</body>
-</html>
+    <script>
+      (function(){
+        const url = document.getElementById('logoUrl');
+        const img = document.getElementById('logoPreview');
+        if (url && img) {
+          url.addEventListener('input', function(){
+            const v = this.value || '';
+            if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('static/')) {
+              img.src = v;
+            }
+          });
+        }
+      })();
+    </script>
+{% endblock %}
 
 

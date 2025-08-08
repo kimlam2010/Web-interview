@@ -1,0 +1,14 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Executive Dashboard{% endblock %}
+{% block content %}
+  <h1 class="h4 mb-3">Executive Dashboard</h1>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tổng quyết định</div><div class="fs-4">{{ decision_analytics.total_decisions or 0 }}</div></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Hoàn tất</div><div class="fs-4">{{ decision_analytics.completed_decisions or 0 }}</div></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Tỉ lệ Hire</div><div class="fs-4">{{ '%.1f' % (decision_analytics.hire_rate or 0) }}%</div></div></div></div>
+    <div class="col-md-3"><div class="card"><div class="card-body"><div class="text-muted small">Phê duyệt lương</div><div class="fs-4">{{ compensation_data.compensation_approvals or 0 }}</div></div></div></div>
+  </div>
+{% endblock %}
+
+

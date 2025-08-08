@@ -113,6 +113,33 @@ def create_app(config_name='development'):
     except Exception as e:
         app.logger.error(f"Failed to initialize security: {e}")
     
+    # Load instance config overrides from instance/system_config.json
+    try:
+        instance_cfg_path = os.path.join(app.instance_path, 'system_config.json')
+        if os.path.exists(instance_cfg_path):
+            import json
+            with open(instance_cfg_path, 'r', encoding='utf-8') as f:
+                overrides = json.load(f)
+            # Update Flask config
+            app.config.update(overrides or {})
+            # Apply CORS headers if configured (simple)
+            cors = (overrides.get('SECURITY_POLICY') or {}).get('cors_allowed_origins')
+            if cors:
+                @app.after_request
+                def _apply_cors(resp):
+                    resp.headers['Access-Control-Allow-Origin'] = ','.join(cors)
+                    resp.headers['Vary'] = 'Origin'
+                    resp.headers['Access-Control-Allow-Headers'] = 'Content-Type, Authorization'
+                    resp.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'
+                    return resp
+            # Apply session lifetime if provided
+            session_hours = overrides.get('SESSION_TIMEOUT_HOURS')
+            if session_hours:
+                app.permanent_session_lifetime = timedelta(hours=int(session_hours))
+            app.logger.info('Loaded system_config.json from instance directory')
+    except Exception as e:
+        app.logger.error(f"Failed to load instance/system_config.json: {e}")
+
     # Register CLI commands
     from .commands import init_db, create_admin, load_sample_data, reset_db
     app.cli.add_command(init_db)

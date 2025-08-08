@@ -10,6 +10,7 @@ This module contains all database models following AGENT_RULES_DEVELOPER:
 """
 
 from datetime import datetime, timedelta
+from flask import current_app
 from typing import Optional, List, Dict, Any
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
@@ -72,8 +73,11 @@ class User(UserMixin, db.Model):
     def increment_login_attempts(self) -> None:
         """Increment failed login attempts and lock if necessary."""
         self.login_attempts += 1
-        if self.login_attempts >= 3:
-            self.locked_until = datetime.utcnow() + timedelta(minutes=30)
+        policy = (current_app.config.get('SECURITY_POLICY') or {})
+        max_attempts = int(policy.get('max_login_attempts', 3))
+        lock_minutes = int(policy.get('lockout_minutes', 30))
+        if self.login_attempts >= max_attempts:
+            self.locked_until = datetime.utcnow() + timedelta(minutes=lock_minutes)
     
     def reset_login_attempts(self) -> None:
         """Reset login attempts on successful login."""

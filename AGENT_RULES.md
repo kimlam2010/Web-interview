@@ -34,6 +34,7 @@
 ### 2.7. UI/UX Agent (Giao diện)
 - Nhiệm vụ chính: Hoàn thiện `app/templates/*`, JS cho timer, autosave, anti-cheat, form validation; đảm bảo responsive.
 - Thống nhất: Ngôn ngữ giao diện và thông báo người dùng đồng nhất; tránh trộn ngôn ngữ.
+- Áp dụng chuẩn: tham chiếu `UI_UX_STANDARDS.md`; tất cả dashboard dùng layout `layouts/base.html`.
 
 ### 2.8. DevOps Agent (Tự động hoá & Triển khai)
 - Nhiệm vụ chính: Chuẩn hóa `install.bat`, `install.sh`, bổ sung `wsgi.py` cho triển khai, quản lý `.env`, hướng tới CI/CD, đóng gói production (Gunicorn + nginx).
@@ -58,6 +59,7 @@
 ### 2.13. Docs Agent (Tài liệu & Hướng dẫn)
 - Nhiệm vụ chính: Cập nhật `README.md`, `PROJECT_SUMMARY.md`, `SOLUTION_1_DOCUMENTATION.md`, đồng bộ roadmap `DEVELOPMENT_TASKS.md`.
 - Quy tắc: Tài liệu rõ ràng, đủ dùng, không thêm file phụ nếu không cần.
+- Liên kết: Chuẩn dashboard nằm trong `DASHBOARD_REQUIREMENTS.md`.
 
 ## 3. Nguyên tắc kỹ thuật chung
 - Ngôn ngữ tài liệu: tiếng Việt; giữ nguyên tên riêng và chữ viết tắt kỹ thuật.

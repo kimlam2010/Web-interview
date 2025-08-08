@@ -1,0 +1,27 @@
+{% extends 'layouts/base.html' %}
+{% block title %}Lịch sử cấu hình{% endblock %}
+{% block content %}
+  <h1 class="h4 mb-3">Lịch sử cấu hình</h1>
+  <div class="table-responsive">
+    <table class="table table-sm table-striped">
+      <thead><tr><th>Phiên bản</th><th class="text-end">Hành động</th></tr></thead>
+      <tbody>
+        {% for f in items %}
+        <tr>
+          <td>{{ f }}</td>
+          <td class="text-end">
+            <form method="post" action="{{ url_for('admin.system_config_rollback', filename=f) }}" class="d-inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Rollback về phiên bản này?')">Rollback</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="2" class="text-center text-muted">Chưa có lịch sử</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}
+
+
