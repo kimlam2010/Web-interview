@@ -1,0 +1,354 @@
+{
+  "lead_developer_questions": [
+    {
+      "id": "LD001",
+      "category": "System Architecture",
+      "title": "IoT Gateway Architecture",
+      "content": "Bạn được yêu cầu thiết kế một IoT Gateway cho hệ thống quản lý thiết bị công nghiệp.\nGateway này cần kết nối với:\n- 50+ sensors (temperature, pressure, vibration)\n- 10+ industrial devices (PLC, SCADA)\n- Cloud platform qua MQTT\n- Local database để cache data\n\nHãy mô tả:\n1. Kiến trúc tổng thể của hệ thống\n2. Cách xử lý real-time data từ sensors\n3. Strategy để handle network failures\n4. Security measures cho industrial environment\n5. Scalability plan khi số lượng devices tăng lên 200+",
+      "time_minutes": 15,
+      "difficulty": "hard",
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "Architecture design skills",
+        "Real-time system understanding", 
+        "Security awareness",
+        "Scalability planning"
+      ],
+      "related_technologies": ["IoT", "MQTT", "PLC", "SCADA", "Industrial protocols"]
+    },
+    {
+      "id": "LD002", 
+      "category": "System Architecture",
+      "title": "Microservices Design",
+      "content": "Dự án cần xây dựng hệ thống quản lý fleet AMR (Autonomous Mobile Robots) với các services:\n- Device Management Service\n- Task Scheduling Service\n- Real-time Monitoring Service\n- Analytics Service\n- Safety Management Service\n\nHãy thiết kế:\n1. Service boundaries và responsibilities\n2. Communication patterns giữa các services\n3. Data consistency strategy\n4. Deployment architecture\n5. Monitoring và observability solution",
+      "time_minutes": 15,
+      "difficulty": "hard",
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "Microservices architecture",
+        "Service design principles",
+        "System integration",
+        "Monitoring strategy"
+      ],
+      "related_technologies": ["Microservices", "AMR", "Fleet Management", "Service mesh"]
+    },
+    {
+      "id": "LD003",
+      "category": "System Architecture", 
+      "title": "Real-time System Design",
+      "content": "Hệ thống cần xử lý real-time data từ 100+ industrial devices với requirements:\n- Latency < 100ms cho critical operations\n- Throughput 10,000+ events/second\n- 99.9% uptime\n- Support cho multiple protocols (OPC-UA, Modbus, MQTT)\n\nHãy đề xuất:\n1. Technology stack phù hợp\n2. Data processing pipeline\n3. Caching strategy\n4. Load balancing approach\n5. Failure recovery mechanisms",
+      "time_minutes": 15,
+      "difficulty": "hard",
+      "position": "lead_developer", 
+      "evaluation_criteria": [
+        "Real-time system design",
+        "Performance optimization",
+        "High availability",
+        "Protocol knowledge"
+      ],
+      "related_technologies": ["Real-time systems", "OPC-UA", "Modbus", "MQTT", "Load balancing"]
+    },
+    {
+      "id": "LD004",
+      "category": "Technical Leadership",
+      "title": "Team Management Scenario", 
+      "content": "Bạn là Tech Lead cho team 8 developers (3 backend, 3 frontend, 2 QA).\nDự án IoT Gateway đang gặp issues:\n- Backend team chậm 2 tuần so với timeline\n- Frontend team không có API documentation\n- QA team không có test environment\n- Client yêu cầu demo trong 1 tuần\n\nHãy mô tả:\n1. Cách bạn prioritize và delegate tasks\n2. Strategy để accelerate development\n3. Communication plan với stakeholders\n4. Risk mitigation approach\n5. Lessons learned cho future projects",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "Leadership skills",
+        "Crisis management", 
+        "Team coordination",
+        "Stakeholder communication"
+      ],
+      "related_technologies": ["Team management", "Project management", "Agile methodologies"]
+    },
+    {
+      "id": "LD005",
+      "category": "Technical Leadership",
+      "title": "Technology Decision Making",
+      "content": "Dự án cần chọn technology stack cho industrial IoT platform với constraints:\n- Budget: 500 triệu VNĐ cho infrastructure\n- Timeline: 6 tháng development\n- Team: 5 developers (mixed experience)\n- Requirements: Scalable, secure, maintainable\n\nHãy đề xuất:\n1. Technology choices với justification\n2. Development approach (monolith vs microservices)\n3. Risk assessment cho từng choice\n4. Migration strategy từ legacy systems\n5. Success metrics và KPIs",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "Decision making framework",
+        "Technology evaluation",
+        "Risk assessment", 
+        "Strategic thinking"
+      ],
+      "related_technologies": ["Technology selection", "Architecture patterns", "Risk management"]
+    },
+    {
+      "id": "LD006",
+      "category": "Industrial Technology",
+      "title": "OPC-UA Implementation",
+      "content": "Dự án cần integrate OPC-UA với industrial devices. Hãy mô tả:\n\n1. OPC-UA architecture và components\n2. Security model (authentication, authorization, encryption)\n3. Data modeling cho industrial sensors\n4. Performance optimization strategies\n5. Integration challenges với legacy systems\n6. Testing approach cho OPC-UA connections",
+      "time_minutes": 15,
+      "difficulty": "hard",
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "OPC-UA expertise",
+        "Industrial protocol knowledge",
+        "Security implementation",
+        "System integration"
+      ],
+      "related_technologies": ["OPC-UA", "Industrial automation", "Security protocols", "Legacy integration"]
+    },
+    {
+      "id": "LD007",
+      "category": "Industrial Technology", 
+      "title": "AMR Navigation & Control",
+      "content": "Hệ thống AMR cần navigation và control capabilities:\n\n1. SLAM (Simultaneous Localization and Mapping) implementation\n2. Path planning algorithms cho dynamic environments\n3. Collision avoidance strategies\n4. Multi-robot coordination\n5. Safety protocols và emergency stops\n6. Integration với warehouse management system",
+      "time_minutes": 15,
+      "difficulty": "hard",
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "Robotics knowledge",
+        "Navigation algorithms",
+        "Safety protocols",
+        "System integration"
+      ],
+      "related_technologies": ["AMR", "SLAM", "Path planning", "Robotics", "Warehouse management"]
+    },
+    {
+      "id": "LD008",
+      "category": "Industrial Technology",
+      "title": "Edge Computing & AI",
+      "content": "Dự án cần implement Edge AI cho real-time processing:\n\n1. Edge computing architecture cho industrial IoT\n2. AI/ML models cho predictive maintenance\n3. Data preprocessing tại edge\n4. Model deployment và versioning\n5. Performance monitoring và optimization\n6. Integration với cloud AI services",
+      "time_minutes": 15,
+      "difficulty": "hard", 
+      "position": "lead_developer",
+      "evaluation_criteria": [
+        "Edge computing knowledge",
+        "AI/ML implementation",
+        "Performance optimization",
+        "Cloud integration"
+      ],
+      "related_technologies": ["Edge computing", "AI/ML", "Predictive maintenance", "Cloud services"]
+    }
+  ],
+  "software_engineer_questions": [
+    {
+      "id": "SE001",
+      "category": "Programming",
+      "title": "Real-time Data Processing",
+      "content": "Bạn cần implement real-time data processing cho 100+ sensors:\n\n```python\n# Current implementation\ndef process_sensor_data(sensor_id, value, timestamp):\n    # Process sensor data\n    processed_data = {\n        'sensor_id': sensor_id,\n        'value': value,\n        'timestamp': timestamp,\n        'status': 'normal'\n    }\n    return processed_data\n```\n\nHãy cải thiện:\n1. Performance optimization\n2. Error handling\n3. Data validation\n4. Memory management\n5. Threading/concurrency approach",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "Code optimization",
+        "Error handling",
+        "Concurrency understanding",
+        "Memory management"
+      ],
+      "related_technologies": ["Python", "Real-time processing", "Threading", "Performance optimization"]
+    },
+    {
+      "id": "SE002",
+      "category": "Programming",
+      "title": "API Design & Implementation", 
+      "content": "Bạn cần design REST API cho device management system:\n\n1. Design API endpoints cho CRUD operations\n2. Authentication và authorization\n3. Rate limiting implementation\n4. Error response format\n5. API versioning strategy\n6. Documentation approach",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "API design principles",
+        "Security implementation",
+        "Documentation skills",
+        "Best practices"
+      ],
+      "related_technologies": ["REST API", "Authentication", "Rate limiting", "API documentation"]
+    },
+    {
+      "id": "SE003",
+      "category": "Programming", 
+      "title": "Database Design & Optimization",
+      "content": "Hệ thống cần lưu trữ data từ industrial devices:\n\n1. Database schema design\n2. Indexing strategy cho performance\n3. Data partitioning approach\n4. Backup và recovery plan\n5. Data retention policies\n6. Migration strategy cho schema changes",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "Database design",
+        "Performance optimization",
+        "Data management",
+        "Migration strategies"
+      ],
+      "related_technologies": ["Database design", "SQL optimization", "Data partitioning", "Backup strategies"]
+    },
+    {
+      "id": "SE004",
+      "category": "Problem Solving",
+      "title": "Performance Optimization",
+      "content": "Hệ thống IoT Gateway đang chậm với 1000+ concurrent connections:\n\n1. Performance profiling approach\n2. Bottleneck identification\n3. Optimization strategies\n4. Caching implementation\n5. Load balancing solutions\n6. Monitoring và alerting",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "Performance analysis",
+        "Optimization techniques",
+        "Monitoring setup",
+        "Problem-solving approach"
+      ],
+      "related_technologies": ["Performance optimization", "Caching", "Load balancing", "Monitoring"]
+    },
+    {
+      "id": "SE005",
+      "category": "Problem Solving",
+      "title": "Security Implementation",
+      "content": "Industrial IoT system cần security measures:\n\n1. Authentication mechanisms\n2. Data encryption (at rest và in transit)\n3. Access control implementation\n4. Security audit logging\n5. Vulnerability assessment\n6. Incident response plan",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer", 
+      "evaluation_criteria": [
+        "Security knowledge",
+        "Implementation skills",
+        "Risk assessment", 
+        "Compliance awareness"
+      ],
+      "related_technologies": ["Security", "Encryption", "Access control", "Audit logging"]
+    },
+    {
+      "id": "SE006",
+      "category": "Problem Solving",
+      "title": "Testing Strategy",
+      "content": "Dự án cần comprehensive testing approach:\n\n1. Unit testing strategy\n2. Integration testing cho IoT devices\n3. Performance testing\n4. Security testing\n5. Automated testing pipeline\n6. Test environment setup",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "Testing methodologies",
+        "Automation skills",
+        "Quality assurance",
+        "DevOps practices"
+      ],
+      "related_technologies": ["Testing frameworks", "Test automation", "CI/CD", "Quality assurance"]
+    },
+    {
+      "id": "SE007",
+      "category": "Technology Stack",
+      "title": "Message Queue Implementation",
+      "content": "Hệ thống cần message queue cho reliable communication:\n\n1. Message queue architecture (RabbitMQ/Kafka)\n2. Message routing strategies\n3. Error handling và retry mechanisms\n4. Dead letter queue implementation\n5. Monitoring và alerting\n6. Performance tuning",
+      "time_minutes": 15,
+      "difficulty": "medium", 
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "Message queue knowledge",
+        "Architecture design",
+        "Error handling",
+        "Performance tuning"
+      ],
+      "related_technologies": ["Message queues", "RabbitMQ", "Kafka", "Event-driven architecture"]
+    },
+    {
+      "id": "SE008",
+      "category": "Technology Stack",
+      "title": "Containerization & Deployment",
+      "content": "Dự án cần containerized deployment:\n\n1. Docker containerization strategy\n2. Kubernetes deployment configuration\n3. Service discovery implementation\n4. Health check mechanisms\n5. Rolling update strategy\n6. Resource management",
+      "time_minutes": 15,
+      "difficulty": "medium",
+      "position": "software_engineer",
+      "evaluation_criteria": [
+        "Containerization skills",
+        "Kubernetes knowledge", 
+        "DevOps practices",
+        "Deployment strategies"
+      ],
+      "related_technologies": ["Docker", "Kubernetes", "Container orchestration", "DevOps"]
+    }
+  ],
+  "interview_configuration": {
+    "total_time_minutes": 60,
+    "sections": {
+      "lead_developer": {
+        "system_architecture": {
+          "time_minutes": 20,
+          "questions_to_select": 3,
+          "available_questions": 8
+        },
+        "technical_leadership": {
+          "time_minutes": 20, 
+          "questions_to_select": 3,
+          "available_questions": 6
+        },
+        "industrial_technology": {
+          "time_minutes": 20,
+          "questions_to_select": 3,
+          "available_questions": 5
+        }
+      },
+      "software_engineer": {
+        "programming": {
+          "time_minutes": 20,
+          "questions_to_select": 3,
+          "available_questions": 8
+        },
+        "problem_solving": {
+          "time_minutes": 20,
+          "questions_to_select": 3,
+          "available_questions": 6
+        },
+        "technology_stack": {
+          "time_minutes": 20,
+          "questions_to_select": 3, 
+          "available_questions": 5
+        }
+      }
+    }
+  },
+  "evaluation_rubric": {
+    "excellent": {
+      "score": "9-10",
+      "criteria": [
+        "Deep technical knowledge",
+        "Clear communication",
+        "Practical solutions", 
+        "Innovation mindset",
+        "Leadership potential"
+      ]
+    },
+    "good": {
+      "score": "7-8", 
+      "criteria": [
+        "Solid technical foundation",
+        "Good problem-solving",
+        "Clear explanations",
+        "Learning attitude"
+      ]
+    },
+    "average": {
+      "score": "5-6",
+      "criteria": [
+        "Basic technical knowledge", 
+        "Some problem-solving ability",
+        "Needs guidance",
+        "Potential for growth"
+      ]
+    },
+    "below_average": {
+      "score": "<5",
+      "criteria": [
+        "Limited technical knowledge",
+        "Poor communication",
+        "Weak problem-solving",
+        "Not suitable for role"
+      ]
+    }
+  },
+  "question_selection_guide": {
+    "lead_developer_focus": [
+      "LD001", "LD002", "LD003", "LD006", "LD007"
+    ],
+    "software_engineer_focus": [
+      "SE001", "SE002", "SE003", "SE004", "SE005"
+    ],
+    "industrial_iot_focus": [
+      "LD006", "LD007", "LD008", "SE001", "SE007"
+    ],
+    "architecture_focus": [
+      "LD001", "LD002", "LD003", "SE002", "SE008"
+    ]
+  }
+}

@@ -1,0 +1,400 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý câu hỏi Step 3 - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-crown me-2"></i>
+                        Quản lý câu hỏi Step 3 (Executive Interview)
+                    </h4>
+                    <div class="btn-group">
+                        <a href="{{ url_for('step3_questions.create_step3_question') }}" 
+                           class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Tạo câu hỏi mới
+                        </a>
+                        <a href="{{ url_for('step3_questions.import_step3_questions') }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-upload me-1"></i>Import
+                        </a>
+                        <a href="{{ url_for('step3_questions.export_step3_questions') }}" 
+                           class="btn btn-info">
+                            <i class="fas fa-download me-1"></i>Export
+                        </a>
+                        <a href="{{ url_for('step3_questions.question_statistics') }}" 
+                           class="btn btn-warning">
+                            <i class="fas fa-chart-bar me-1"></i>Thống kê
+                        </a>
+                        <a href="{{ url_for('step3_questions.list_interview_structures') }}" 
+                           class="btn btn-secondary">
+                            <i class="fas fa-sitemap me-1"></i>Cấu trúc phỏng vấn
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label for="category" class="form-label">Danh mục</label>
+                            <select class="form-select" id="category" name="category">
+                                <option value="">Tất cả danh mục</option>
+                                {% for category in categories %}
+                                <option value="{{ category[0] }}" 
+                                        {% if request.args.get('category') == category[0] %}selected{% endif %}>
+                                    {{ category[0] }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="difficulty" class="form-label">Độ khó</label>
+                            <select class="form-select" id="difficulty" name="difficulty">
+                                <option value="">Tất cả</option>
+                                {% for difficulty in difficulties %}
+                                <option value="{{ difficulty }}" 
+                                        {% if request.args.get('difficulty') == difficulty %}selected{% endif %}>
+                                    {{ difficulty.title() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="assigned_to" class="form-label">Phân công</label>
+                            <select class="form-select" id="assigned_to" name="assigned_to">
+                                <option value="">Tất cả</option>
+                                {% for assignment in assignments %}
+                                <option value="{{ assignment }}" 
+                                        {% if request.args.get('assigned_to') == assignment %}selected{% endif %}>
+                                    {{ assignment.upper() }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="position_id" class="form-label">Vị trí</label>
+                            <select class="form-select" id="position_id" name="position_id">
+                                <option value="">Tất cả vị trí</option>
+                                {% for position in positions %}
+                                <option value="{{ position.id }}" 
+                                        {% if request.args.get('position_id')|int == position.id %}selected{% endif %}>
+                                    {{ position.title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search me-1"></i>Lọc
+                            </button>
+                            <a href="{{ url_for('step3_questions.list_step3_questions') }}" 
+                               class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Xóa
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Statistics Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-question-circle me-2"></i>Tổng câu hỏi
+                                    </h5>
+                                    <h3 class="mb-0">{{ questions.total }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-user-tie me-2"></i>CTO Questions
+                                    </h5>
+                                    <h3 class="mb-0">{{ questions.items|selectattr('assigned_to', 'in', ['cto', 'both'])|list|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-user-graduate me-2"></i>CEO Questions
+                                    </h5>
+                                    <h3 class="mb-0">{{ questions.items|selectattr('assigned_to', 'in', ['ceo', 'both'])|list|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">
+                                        <i class="fas fa-star me-2"></i>Trung bình điểm
+                                    </h5>
+                                    <h3 class="mb-0">
+                                        {% set avg_score = questions.items|map(attribute='average_score')|list|sum / questions.items|length if questions.items else 0 %}
+                                        {{ "%.1f"|format(avg_score) }}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th width="5%">
+                                        <input type="checkbox" id="selectAll" class="form-check-input">
+                                    </th>
+                                    <th width="5%">ID</th>
+                                    <th width="25%">Nội dung câu hỏi</th>
+                                    <th width="10%">Loại</th>
+                                    <th width="10%">Danh mục</th>
+                                    <th width="8%">Phân công</th>
+                                    <th width="8%">Độ khó</th>
+                                    <th width="8%">Thời gian</th>
+                                    <th width="8%">Điểm TB</th>
+                                    <th width="8%">Tỷ lệ thành công</th>
+                                    <th width="10%">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for question in questions.items %}
+                                <tr>
+                                    <td>
+                                        <input type="checkbox" name="selected_questions" 
+                                               value="{{ question.id }}" class="form-check-input question-checkbox">
+                                    </td>
+                                    <td>{{ question.id }}</td>
+                                    <td>
+                                        <div class="question-content">
+                                            <strong>{{ question.content[:100] }}{% if question.content|length > 100 %}...{% endif %}</strong>
+                                            <br>
+                                            <small class="text-muted">
+                                                <i class="fas fa-tag me-1"></i>{{ question.question_type }}
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ question.question_type }}</span>
+                                    </td>
+                                    <td>{{ question.category }}</td>
+                                    <td>
+                                        {% if question.assigned_to == 'cto' %}
+                                            <span class="badge bg-primary">CTO</span>
+                                        {% elif question.assigned_to == 'ceo' %}
+                                            <span class="badge bg-info">CEO</span>
+                                        {% else %}
+                                            <span class="badge bg-success">CẢ HAI</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if question.difficulty_level == 'beginner' %}
+                                            <span class="badge bg-success">Dễ</span>
+                                        {% elif question.difficulty_level == 'intermediate' %}
+                                            <span class="badge bg-warning">Trung bình</span>
+                                        {% elif question.difficulty_level == 'advanced' %}
+                                            <span class="badge bg-danger">Khó</span>
+                                        {% else %}
+                                            <span class="badge bg-dark">Chuyên gia</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ question.time_allocation }} phút</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if question.average_score >= 8 else 'warning' if question.average_score >= 6 else 'danger' }}">
+                                            {{ "%.1f"|format(question.average_score) }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar bg-{{ 'success' if question.success_rate >= 80 else 'warning' if question.success_rate >= 60 else 'danger' }}" 
+                                                 style="width: {{ question.success_rate }}%">
+                                                {{ "%.0f"|format(question.success_rate) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('step3_questions.edit_step3_question', question_id=question.id) }}" 
+                                               class="btn btn-outline-primary" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-outline-danger" 
+                                                    onclick="deleteQuestion({{ question.id }})" title="Xóa">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="11" class="text-center text-muted">
+                                        <i class="fas fa-inbox fa-2x mb-2"></i>
+                                        <br>Không có câu hỏi nào được tìm thấy
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Bulk Operations -->
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-outline-success" onclick="bulkAction('activate')">
+                                    <i class="fas fa-check me-1"></i>Kích hoạt
+                                </button>
+                                <button type="button" class="btn btn-outline-warning" onclick="bulkAction('deactivate')">
+                                    <i class="fas fa-pause me-1"></i>Tạm dừng
+                                </button>
+                                <button type="button" class="btn btn-outline-danger" onclick="bulkAction('delete')">
+                                    <i class="fas fa-trash me-1"></i>Xóa
+                                </button>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <!-- Pagination -->
+                            {% if questions.pages > 1 %}
+                            <nav aria-label="Question pagination">
+                                <ul class="pagination justify-content-end mb-0">
+                                    {% if questions.has_prev %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('step3_questions.list_step3_questions', page=questions.prev_num, **request.args) }}">
+                                            <i class="fas fa-chevron-left"></i>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    
+                                    {% for page_num in questions.iter_pages() %}
+                                        {% if page_num %}
+                                            {% if page_num != questions.page %}
+                                            <li class="page-item">
+                                                <a class="page-link" href="{{ url_for('step3_questions.list_step3_questions', page=page_num, **request.args) }}">
+                                                    {{ page_num }}
+                                                </a>
+                                            </li>
+                                            {% else %}
+                                            <li class="page-item active">
+                                                <span class="page-link">{{ page_num }}</span>
+                                            </li>
+                                            {% endif %}
+                                        {% else %}
+                                        <li class="page-item disabled">
+                                            <span class="page-link">...</span>
+                                        </li>
+                                        {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if questions.has_next %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('step3_questions.list_step3_questions', page=questions.next_num, **request.args) }}">
+                                            <i class="fas fa-chevron-right"></i>
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                </ul>
+                            </nav>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa câu hỏi này không?</p>
+                <p class="text-danger"><small>Hành động này không thể hoàn tác!</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form id="deleteForm" method="POST" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Select all functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.question-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+});
+
+// Delete question function
+function deleteQuestion(questionId) {
+    if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này không?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/step3/questions/${questionId}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// Bulk actions
+function bulkAction(action) {
+    const selectedQuestions = document.querySelectorAll('.question-checkbox:checked');
+    if (selectedQuestions.length === 0) {
+        alert('Vui lòng chọn ít nhất một câu hỏi!');
+        return;
+    }
+    
+    const questionIds = Array.from(selectedQuestions).map(cb => cb.value);
+    
+    if (action === 'delete') {
+        if (!confirm(`Bạn có chắc chắn muốn xóa ${questionIds.length} câu hỏi đã chọn?`)) {
+            return;
+        }
+    }
+    
+    // Send bulk action request
+    fetch('/step3/questions/bulk-operations', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            action: action,
+            question_ids: questionIds
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Lỗi: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra!');
+    });
+}
+</script>
+{% endblock %} 

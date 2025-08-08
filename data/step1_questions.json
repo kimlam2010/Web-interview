@@ -1,0 +1,181 @@
+{
+  "iq_questions": [
+    {
+      "id": 1,
+      "type": "logical_reasoning",
+      "category": "Pattern Recognition",
+      "question": "Trong chuỗi số 2, 6, 12, 20, 30, ?, số tiếp theo là gì?",
+      "options": ["40", "42", "44", "46"],
+      "correct_answer": "42",
+      "explanation": "Chuỗi tăng theo pattern: +4, +6, +8, +10, +12",
+      "difficulty": "medium",
+      "points": 1
+    },
+    {
+      "id": 2,
+      "type": "logical_reasoning", 
+      "category": "Logical Sequence",
+      "question": "Nếu A = 1, B = 2, C = 3, thì từ 'CAB' có giá trị bằng bao nhiêu?",
+      "options": ["312", "6", "321", "123"],
+      "correct_answer": "312",
+      "explanation": "C(3) + A(1) + B(2) = 312",
+      "difficulty": "easy",
+      "points": 1
+    },
+    {
+      "id": 3,
+      "type": "spatial_reasoning",
+      "category": "3D Visualization", 
+      "question": "Một khối lập phương được cắt làm đôi theo đường chéo. Kết quả sẽ có mấy mặt?",
+      "options": ["8", "10", "12", "14"],
+      "correct_answer": "10",
+      "explanation": "Mỗi nửa có 5 mặt: 3 mặt gốc + 1 mặt đáy + 1 mặt cắt",
+      "difficulty": "hard",
+      "points": 2
+    },
+    {
+      "id": 4,
+      "type": "mathematical_reasoning",
+      "category": "Number Series",
+      "question": "Trong dãy số 1, 1, 2, 3, 5, 8, ?, số tiếp theo là gì?",
+      "options": ["11", "13", "15", "17"],
+      "correct_answer": "13",
+      "explanation": "Dãy Fibonacci: mỗi số = tổng 2 số trước",
+      "difficulty": "medium",
+      "points": 1
+    },
+    {
+      "id": 5,
+      "type": "verbal_reasoning",
+      "category": "Analogies",
+      "question": "Sách : Thư viện = Bệnh nhân : ?",
+      "options": ["Bác sĩ", "Bệnh viện", "Thuốc", "Điều trị"],
+      "correct_answer": "Bệnh viện",
+      "explanation": "Quan hệ: vật/người và nơi chứa/điều trị",
+      "difficulty": "easy",
+      "points": 1
+    }
+  ],
+  "technical_questions": [
+    {
+      "id": 1,
+      "type": "programming_fundamentals",
+      "category": "Data Structures",
+      "question": "Cấu trúc dữ liệu nào phù hợp nhất cho việc implement undo/redo functionality?",
+      "options": ["Array", "Stack", "Queue", "Linked List"],
+      "correct_answer": "Stack",
+      "explanation": "Stack LIFO phù hợp cho undo (last action first)",
+      "difficulty": "medium",
+      "points": 2
+    },
+    {
+      "id": 2,
+      "type": "web_development",
+      "category": "HTTP Protocol",
+      "question": "HTTP status code 201 có nghĩa là gì?",
+      "options": ["OK", "Created", "Not Found", "Server Error"],
+      "correct_answer": "Created",
+      "explanation": "201 = Successfully created new resource",
+      "difficulty": "easy",
+      "points": 1
+    },
+    {
+      "id": 3,
+      "type": "database",
+      "category": "SQL Fundamentals",
+      "question": "Câu lệnh SQL nào được sử dụng để lấy dữ liệu từ database?",
+      "options": ["GET", "FETCH", "SELECT", "RETRIEVE"],
+      "correct_answer": "SELECT",
+      "explanation": "SELECT là câu lệnh chuẩn để query data",
+      "difficulty": "easy",
+      "points": 1
+    },
+    {
+      "id": 4,
+      "type": "algorithms",
+      "category": "Time Complexity",
+      "question": "Time complexity của Binary Search là gì?",
+      "options": ["O(1)", "O(log n)", "O(n)", "O(n²)"],
+      "correct_answer": "O(log n)",
+      "explanation": "Binary search chia đôi search space mỗi iteration",
+      "difficulty": "medium",
+      "points": 2
+    },
+    {
+      "id": 5,
+      "type": "iot_industrial",
+      "category": "IoT Protocols",
+      "question": "Protocol nào thường được sử dụng cho IoT communication với low bandwidth?",
+      "options": ["HTTP", "MQTT", "FTP", "SMTP"],
+      "correct_answer": "MQTT",
+      "explanation": "MQTT lightweight, designed for IoT/M2M communication",
+      "difficulty": "medium",
+      "points": 2
+    },
+    {
+      "id": 6,
+      "type": "industrial_systems",
+      "category": "Industrial Protocols",
+      "question": "OPC-UA được sử dụng chủ yếu trong lĩnh vực nào?",
+      "options": ["Web Development", "Mobile Apps", "Industrial Automation", "Gaming"],
+      "correct_answer": "Industrial Automation",
+      "explanation": "OPC-UA = industry standard for industrial communication",
+      "difficulty": "medium",
+      "points": 2
+    },
+    {
+      "id": 7,
+      "type": "robotics",
+      "category": "AMR Technology",
+      "question": "SLAM trong robotics có nghĩa là gì?",
+      "options": ["Simple Linear Autonomous Movement", "Simultaneous Localization and Mapping", "Smart Location and Motion", "System Level Automation Management"],
+      "correct_answer": "Simultaneous Localization and Mapping",
+      "explanation": "SLAM = robot tự định vị và xây dựng bản đồ đồng thời",
+      "difficulty": "hard",
+      "points": 3
+    },
+    {
+      "id": 8,
+      "type": "security",
+      "category": "Cybersecurity",
+      "question": "Phương pháp nào được sử dụng để hash passwords an toàn?",
+      "options": ["MD5", "SHA-1", "bcrypt", "Base64"],
+      "correct_answer": "bcrypt",
+      "explanation": "bcrypt designed specifically for password hashing with salt",
+      "difficulty": "medium",
+      "points": 2
+    },
+    {
+      "id": 9,
+      "type": "networking",
+      "category": "Network Fundamentals",
+      "question": "Port mặc định của HTTPS là gì?",
+      "options": ["80", "443", "8080", "22"],
+      "correct_answer": "443",
+      "explanation": "HTTPS standard port = 443, HTTP = 80",
+      "difficulty": "easy",
+      "points": 1
+    },
+    {
+      "id": 10,
+      "type": "cloud_computing",
+      "category": "Containerization",
+      "question": "Docker container khác gì với Virtual Machine?",
+      "options": ["Không có sự khác biệt", "Container chia sẻ OS kernel", "VM nhẹ hơn", "Container cần hypervisor"],
+      "correct_answer": "Container chia sẻ OS kernel",
+      "explanation": "Container share host OS kernel, VM có OS riêng",
+      "difficulty": "medium",
+      "points": 2
+    }
+  ],
+  "scoring_config": {
+    "iq_weight": 0.4,
+    "technical_weight": 0.6,
+    "pass_threshold": 70,
+    "total_questions": {
+      "iq": 10,
+      "technical": 15
+    },
+    "time_limit_minutes": 30
+  }
+}

@@ -1,0 +1,444 @@
+{% extends "base.html" %}
+
+{% block title %}Question Bank - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Question Bank Management</h1>
+            <p class="text-muted">Manage questions for all recruitment steps</p>
+        </div>
+        <div>
+            <a href="{{ url_for('questions.question_statistics') }}" class="btn btn-outline-info">
+                <i class="fas fa-chart-bar me-2"></i>Statistics
+            </a>
+            <a href="{{ url_for('questions.import_questions') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-upload me-2"></i>Import
+            </a>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                    <i class="fas fa-plus me-2"></i>Add Question
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{{ url_for('questions.add_step1_question') }}">
+                        <i class="fas fa-brain me-2"></i>Step 1 (IQ + Technical)
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('questions.add_step2_question') }}">
+                        <i class="fas fa-code me-2"></i>Step 2 (Technical Interview)
+                    </a></li>
+                    <li><a class="dropdown-item" href="{{ url_for('questions.add_step3_question') }}">
+                        <i class="fas fa-user-tie me-2"></i>Step 3 (Executive Interview)
+                    </a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step Navigation -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <ul class="nav nav-tabs" id="stepTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if step == 'step1' %}active{% endif %}" 
+                            onclick="window.location.href='{{ url_for('questions.question_bank', step='step1') }}'">
+                        <i class="fas fa-brain me-2"></i>Step 1 (IQ + Technical)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if step == 'step2' %}active{% endif %}" 
+                            onclick="window.location.href='{{ url_for('questions.question_bank', step='step2') }}'">
+                        <i class="fas fa-code me-2"></i>Step 2 (Technical Interview)
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link {% if step == 'step3' %}active{% endif %}" 
+                            onclick="window.location.href='{{ url_for('questions.question_bank', step='step3') }}'">
+                        <i class="fas fa-user-tie me-2"></i>Step 3 (Executive Interview)
+                    </button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <input type="hidden" name="step" value="{{ step }}">
+                <div class="col-md-3">
+                    <label for="category" class="form-label">Category</label>
+                    <select class="form-select" id="category" name="category">
+                        <option value="">All Categories</option>
+                        {% if step == 'step1' %}
+                            <option value="logical" {% if category == 'logical' %}selected{% endif %}>Logical Reasoning</option>
+                            <option value="spatial" {% if category == 'spatial' %}selected{% endif %}>Spatial Reasoning</option>
+                            <option value="numerical" {% if category == 'numerical' %}selected{% endif %}>Numerical Reasoning</option>
+                            <option value="verbal" {% if category == 'verbal' %}selected{% endif %}>Verbal Reasoning</option>
+                            <option value="programming" {% if category == 'programming' %}selected{% endif %}>Programming</option>
+                            <option value="databases" {% if category == 'databases' %}selected{% endif %}>Databases</option>
+                            <option value="algorithms" {% if category == 'algorithms' %}selected{% endif %}>Algorithms</option>
+                            <option value="web_development" {% if category == 'web_development' %}selected{% endif %}>Web Development</option>
+                            <option value="mobile_development" {% if category == 'mobile_development' %}selected{% endif %}>Mobile Development</option>
+                            <option value="devops" {% if category == 'devops' %}selected{% endif %}>DevOps</option>
+                            <option value="ai_ml" {% if category == 'ai_ml' %}selected{% endif %}>AI/ML</option>
+                        {% elif step == 'step2' %}
+                            <option value="programming" {% if category == 'programming' %}selected{% endif %}>Programming</option>
+                            <option value="databases" {% if category == 'databases' %}selected{% endif %}>Databases</option>
+                            <option value="algorithms" {% if category == 'algorithms' %}selected{% endif %}>Algorithms</option>
+                            <option value="web_development" {% if category == 'web_development' %}selected{% endif %}>Web Development</option>
+                            <option value="mobile_development" {% if category == 'mobile_development' %}selected{% endif %}>Mobile Development</option>
+                            <option value="devops" {% if category == 'devops' %}selected{% endif %}>DevOps</option>
+                            <option value="ai_ml" {% if category == 'ai_ml' %}selected{% endif %}>AI/ML</option>
+                            <option value="system_design" {% if category == 'system_design' %}selected{% endif %}>System Design</option>
+                            <option value="problem_solving" {% if category == 'problem_solving' %}selected{% endif %}>Problem Solving</option>
+                        {% elif step == 'step3' %}
+                            <option value="leadership" {% if category == 'leadership' %}selected{% endif %}>Leadership</option>
+                            <option value="strategy" {% if category == 'strategy' %}selected{% endif %}>Strategy</option>
+                            <option value="management" {% if category == 'management' %}selected{% endif %}>Management</option>
+                            <option value="technical_vision" {% if category == 'technical_vision' %}selected{% endif %}>Technical Vision</option>
+                            <option value="business_acumen" {% if category == 'business_acumen' %}selected{% endif %}>Business Acumen</option>
+                            <option value="culture_fit" {% if category == 'culture_fit' %}selected{% endif %}>Culture Fit</option>
+                        {% endif %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="difficulty" class="form-label">Difficulty</label>
+                    <select class="form-select" id="difficulty" name="difficulty">
+                        <option value="">All Difficulties</option>
+                        <option value="easy" {% if difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                        <option value="medium" {% if difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="hard" {% if difficulty == 'hard' %}selected{% endif %}>Hard</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="is_active" class="form-label">Status</label>
+                    <select class="form-select" id="is_active" name="is_active">
+                        <option value="">All Status</option>
+                        <option value="true" {% if is_active == 'true' %}selected{% endif %}>Active</option>
+                        <option value="false" {% if is_active == 'false' %}selected{% endif %}>Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search me-2"></i>Filter
+                    </button>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <a href="{{ url_for('questions.question_bank', step=step) }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-times me-2"></i>Clear Filters
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Questions Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">{{ question_type }} ({{ questions.total }})</h5>
+            <div>
+                <button class="btn btn-sm btn-outline-success" id="bulkActivateBtn" style="display: none;">
+                    <i class="fas fa-check me-1"></i>Activate Selected
+                </button>
+                <button class="btn btn-sm btn-outline-warning" id="bulkDeactivateBtn" style="display: none;">
+                    <i class="fas fa-pause me-1"></i>Deactivate Selected
+                </button>
+                <button class="btn btn-sm btn-outline-danger" id="bulkDeleteBtn" style="display: none;">
+                    <i class="fas fa-trash me-1"></i>Delete Selected
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if questions.items %}
+            <form id="bulkForm" method="POST" action="{{ url_for('questions.bulk_action') }}">
+                <input type="hidden" name="step" value="{{ step }}">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>Question</th>
+                                <th>Category</th>
+                                <th>Difficulty</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for question in questions.items %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="question_ids" value="{{ question.id }}" 
+                                           class="form-check-input question-checkbox">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-start">
+                                        <div class="flex-grow-1">
+                                            {% if step == 'step1' %}
+                                                <h6 class="mb-1">{{ question.question_text[:100] }}{% if question.question_text|length > 100 %}...{% endif %}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-{{ 'brain' if question.question_type == 'iq' else 'code' }} me-1"></i>
+                                                    {{ question.question_type.title() }}
+                                                </small>
+                                            {% elif step == 'step2' %}
+                                                <h6 class="mb-1">{{ question.title }}</h6>
+                                                <small class="text-muted">{{ question.content[:100] }}{% if question.content|length > 100 %}...{% endif %}</small>
+                                            {% elif step == 'step3' %}
+                                                <h6 class="mb-1">{{ question.title }}</h6>
+                                                <small class="text-muted">
+                                                    <i class="fas fa-{{ 'user-tie' if question.question_type == 'cto' else 'crown' }} me-1"></i>
+                                                    {{ question.question_type.upper() }}
+                                                </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ question.category.replace('_', ' ').title() }}</span>
+                                </td>
+                                <td>
+                                    {% set difficulty_colors = {
+                                        'easy': 'success',
+                                        'medium': 'warning',
+                                        'hard': 'danger'
+                                    } %}
+                                    <span class="badge bg-{{ difficulty_colors.get(question.difficulty, 'secondary') }}">
+                                        {{ question.difficulty.title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if question.is_active %}
+                                        <span class="badge bg-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ question.created_at.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                                data-bs-toggle="dropdown">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('questions.edit_question', step=step, question_id=question.id) }}">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="viewQuestion('{{ step }}', {{ question.id }})">
+                                                    <i class="fas fa-eye me-2"></i>View Details
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('questions.duplicate_question', step=step, question_id=question.id) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" class="dropdown-item">
+                                                        <i class="fas fa-copy me-2"></i>Duplicate
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('questions.delete_question', step=step, question_id=question.id) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" class="dropdown-item text-danger" 
+                                                            onclick="return confirm('Are you sure you want to delete this question?')">
+                                                        <i class="fas fa-trash me-2"></i>Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+
+            <!-- Pagination -->
+            {% if questions.pages > 1 %}
+            <nav aria-label="Question pagination">
+                <ul class="pagination justify-content-center">
+                    {% if questions.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('questions.question_bank', step=step, page=questions.prev_num, **request.args) }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in questions.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != questions.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('questions.question_bank', step=step, page=page_num, **request.args) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if questions.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('questions.question_bank', step=step, page=questions.next_num, **request.args) }}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-question-circle fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No questions found</h5>
+                <p class="text-muted">Try adjusting your filters or add a new question.</p>
+                <div class="btn-group" role="group">
+                    <a href="{{ url_for('questions.add_step1_question') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Step 1 Question
+                    </a>
+                    <a href="{{ url_for('questions.add_step2_question') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Step 2 Question
+                    </a>
+                    <a href="{{ url_for('questions.add_step3_question') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-2"></i>Add Step 3 Question
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Question Details Modal -->
+<div class="modal fade" id="questionModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Question Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="questionModalBody">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Select all functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.question-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateBulkButtons();
+});
+
+// Individual checkbox change
+document.querySelectorAll('.question-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updateBulkButtons);
+});
+
+function updateBulkButtons() {
+    const checkedBoxes = document.querySelectorAll('.question-checkbox:checked');
+    const bulkActivateBtn = document.getElementById('bulkActivateBtn');
+    const bulkDeactivateBtn = document.getElementById('bulkDeactivateBtn');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    
+    if (checkedBoxes.length > 0) {
+        bulkActivateBtn.style.display = 'inline-block';
+        bulkDeactivateBtn.style.display = 'inline-block';
+        bulkDeleteBtn.style.display = 'inline-block';
+        bulkDeleteBtn.textContent = `Delete Selected (${checkedBoxes.length})`;
+    } else {
+        bulkActivateBtn.style.display = 'none';
+        bulkDeactivateBtn.style.display = 'none';
+        bulkDeleteBtn.style.display = 'none';
+    }
+}
+
+// Bulk actions
+document.getElementById('bulkActivateBtn').addEventListener('click', function() {
+    if (confirm('Activate selected questions?')) {
+        document.querySelector('input[name="action"]').value = 'activate';
+        document.getElementById('bulkForm').submit();
+    }
+});
+
+document.getElementById('bulkDeactivateBtn').addEventListener('click', function() {
+    if (confirm('Deactivate selected questions?')) {
+        document.querySelector('input[name="action"]').value = 'deactivate';
+        document.getElementById('bulkForm').submit();
+    }
+});
+
+document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
+    const checkedBoxes = document.querySelectorAll('.question-checkbox:checked');
+    if (checkedBoxes.length === 0) {
+        alert('Please select questions to delete.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${checkedBoxes.length} question(s)?`)) {
+        document.querySelector('input[name="action"]').value = 'delete';
+        document.getElementById('bulkForm').submit();
+    }
+});
+
+// View question details
+function viewQuestion(step, questionId) {
+    // This would typically make an AJAX call to get question details
+    // For now, we'll just show a placeholder
+    document.getElementById('questionModalBody').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading question details...</p>
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('questionModal'));
+    modal.show();
+    
+    // In a real implementation, you would make an AJAX call here
+    // fetch(`/questions/${step}/${questionId}/details`)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         document.getElementById('questionModalBody').innerHTML = data.html;
+    //     });
+}
+
+// Auto-submit form on filter change
+document.querySelectorAll('#category, #difficulty, #is_active').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+</script>
+{% endblock %} 

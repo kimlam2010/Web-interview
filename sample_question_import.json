@@ -1,0 +1,83 @@
+{
+  "import_metadata": {
+    "step": 1,
+    "question_type": "technical",
+    "category": "programming",
+    "difficulty": "medium",
+    "position_level": "lead",
+    "import_date": "2024-01-15",
+    "total_questions": 5
+  },
+  "questions": [
+    {
+      "question_text": "Which design pattern is most suitable for implementing a plugin architecture in an IoT gateway system?",
+      "options": [
+        "Singleton Pattern",
+        "Observer Pattern", 
+        "Strategy Pattern",
+        "Factory Pattern"
+      ],
+      "correct_answer": "Strategy Pattern",
+      "explanation": "Strategy pattern allows different algorithms to be selected at runtime, perfect for plugin systems where different protocols (MQTT, OPC-UA, Modbus) can be implemented as interchangeable strategies.",
+      "points": 2,
+      "difficulty": "medium",
+      "related_technologies": ["Design Patterns", "IoT", "Plugin Architecture"]
+    },
+    {
+      "question_text": "In a microservices architecture for industrial IoT, what is the primary benefit of using API Gateway pattern?",
+      "options": [
+        "Reduced database load",
+        "Centralized authentication and routing",
+        "Faster database queries", 
+        "Simplified frontend development"
+      ],
+      "correct_answer": "Centralized authentication and routing",
+      "explanation": "API Gateway provides centralized authentication, routing, rate limiting, and monitoring for all microservices, which is crucial for industrial IoT security and management.",
+      "points": 2,
+      "difficulty": "hard",
+      "related_technologies": ["Microservices", "API Gateway", "Industrial IoT"]
+    },
+    {
+      "question_text": "What is the time complexity of the SLAM (Simultaneous Localization and Mapping) algorithm commonly used in AMR navigation?",
+      "options": [
+        "O(1)",
+        "O(log n)", 
+        "O(n)",
+        "O(n²)"
+      ],
+      "correct_answer": "O(n²)",
+      "explanation": "SLAM algorithms typically have O(n²) complexity due to the need to maintain and update a covariance matrix for all landmarks and robot poses.",
+      "points": 3,
+      "difficulty": "hard",
+      "related_technologies": ["SLAM", "AMR", "Robotics", "Navigation"]
+    },
+    {
+      "question_text": "Which protocol is most suitable for real-time communication between industrial sensors and edge computing devices?",
+      "options": [
+        "HTTP REST",
+        "MQTT",
+        "FTP",
+        "SMTP"
+      ],
+      "correct_answer": "MQTT",
+      "explanation": "MQTT is lightweight, supports QoS levels, and is designed for IoT/M2M communication with minimal bandwidth usage, making it ideal for industrial sensor networks.",
+      "points": 1,
+      "difficulty": "medium",
+      "related_technologies": ["MQTT", "Industrial IoT", "Real-time Communication"]
+    },
+    {
+      "question_text": "What is the primary advantage of using Edge AI for predictive maintenance in industrial systems?",
+      "options": [
+        "Lower cloud costs",
+        "Reduced latency for real-time decisions",
+        "Better data visualization",
+        "Simplified deployment"
+      ],
+      "correct_answer": "Reduced latency for real-time decisions",
+      "explanation": "Edge AI processes data locally, enabling immediate response to equipment anomalies without waiting for cloud round-trip, which is critical for industrial safety and efficiency.",
+      "points": 2,
+      "difficulty": "medium",
+      "related_technologies": ["Edge Computing", "AI/ML", "Predictive Maintenance"]
+    }
+  ]
+} 

@@ -1,0 +1,434 @@
+{% extends "base.html" %}
+
+{% block title %}Báo cáo - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Hệ thống báo cáo
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Report Types -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-users fa-2x mb-2"></i>
+                                    <h5>Tiến độ ứng viên</h5>
+                                    <p class="mb-0">Theo dõi tiến độ của từng ứng viên</p>
+                                    <button class="btn btn-light btn-sm mt-2" onclick="generateReport('candidate-progress')">
+                                        Tạo báo cáo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-briefcase fa-2x mb-2"></i>
+                                    <h5>Hiệu suất vị trí</h5>
+                                    <p class="mb-0">Phân tích hiệu suất theo vị trí</p>
+                                    <button class="btn btn-light btn-sm mt-2" onclick="generateReport('position-performance')">
+                                        Tạo báo cáo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-user-tie fa-2x mb-2"></i>
+                                    <h5>Hiệu suất phỏng vấn</h5>
+                                    <p class="mb-0">Đánh giá hiệu suất người phỏng vấn</p>
+                                    <button class="btn btn-light btn-sm mt-2" onclick="generateReport('interviewer-performance')">
+                                        Tạo báo cáo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-file-alt fa-2x mb-2"></i>
+                                    <h5>Báo cáo tổng hợp</h5>
+                                    <p class="mb-0">Báo cáo toàn diện về tuyển dụng</p>
+                                    <button class="btn btn-light btn-sm mt-2" onclick="generateReport('comprehensive')">
+                                        Tạo báo cáo
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Options -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Tùy chọn lọc</h5>
+                                </div>
+                                <div class="card-body">
+                                    <form id="reportFilterForm">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <label for="date_from" class="form-label">Từ ngày</label>
+                                                <input type="date" class="form-control" id="date_from" name="date_from">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="date_to" class="form-label">Đến ngày</label>
+                                                <input type="date" class="form-control" id="date_to" name="date_to">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="position_id" class="form-label">Vị trí</label>
+                                                <select class="form-select" id="position_id" name="position_id">
+                                                    <option value="">Tất cả vị trí</option>
+                                                    {% for position in positions %}
+                                                    <option value="{{ position.id }}">{{ position.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <label for="candidate_id" class="form-label">Ứng viên</label>
+                                                <select class="form-select" id="candidate_id" name="candidate_id">
+                                                    <option value="">Tất cả ứng viên</option>
+                                                    {% for candidate in candidates %}
+                                                    <option value="{{ candidate.id }}">{{ candidate.name }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-3">
+                                            <div class="col-12">
+                                                <button type="button" class="btn btn-primary" onclick="applyFilters()">
+                                                    <i class="fas fa-filter me-1"></i>Áp dụng bộ lọc
+                                                </button>
+                                                <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                                                    <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Report Results -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Kết quả báo cáo</h5>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-success" onclick="exportToExcel()">
+                                            <i class="fas fa-file-excel me-1"></i>Xuất Excel
+                                        </button>
+                                        <button type="button" class="btn btn-info" onclick="exportToPDF()">
+                                            <i class="fas fa-file-pdf me-1"></i>Xuất PDF
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="reportContent">
+                                        <div class="text-center text-muted">
+                                            <i class="fas fa-chart-line fa-3x mb-3"></i>
+                                            <p>Chọn loại báo cáo và bộ lọc để xem kết quả</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Automated Reports -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Báo cáo tự động</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="card border-primary">
+                                                <div class="card-body text-center">
+                                                    <i class="fas fa-calendar-day fa-2x text-primary mb-2"></i>
+                                                    <h6>Báo cáo hàng ngày</h6>
+                                                    <p class="small">Tóm tắt tuyển dụng hàng ngày</p>
+                                                    <button class="btn btn-outline-primary btn-sm" onclick="scheduleReport('daily')">
+                                                        Lên lịch
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card border-success">
+                                                <div class="card-body text-center">
+                                                    <i class="fas fa-calendar-week fa-2x text-success mb-2"></i>
+                                                    <h6>Báo cáo hàng tuần</h6>
+                                                    <p class="small">Báo cáo chi tiết hàng tuần</p>
+                                                    <button class="btn btn-outline-success btn-sm" onclick="scheduleReport('weekly')">
+                                                        Lên lịch
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="card border-warning">
+                                                <div class="card-body text-center">
+                                                    <i class="fas fa-calendar-alt fa-2x text-warning mb-2"></i>
+                                                    <h6>Báo cáo hàng tháng</h6>
+                                                    <p class="small">Báo cáo tổng hợp hàng tháng</p>
+                                                    <button class="btn btn-outline-warning btn-sm" onclick="scheduleReport('monthly')">
+                                                        Lên lịch
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Report Generation Modal -->
+<div class="modal fade" id="reportModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tạo báo cáo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="reportLoading" class="text-center" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="mt-2">Đang tạo báo cáo...</p>
+                </div>
+                <div id="reportResults" style="display: none;">
+                    <!-- Report results will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-success" id="exportExcelBtn" style="display: none;">
+                    <i class="fas fa-file-excel me-1"></i>Xuất Excel
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let currentReportType = null;
+let currentReportData = null;
+
+// Generate report function
+function generateReport(reportType) {
+    currentReportType = reportType;
+    
+    // Show modal
+    const modal = new bootstrap.Modal(document.getElementById('reportModal'));
+    modal.show();
+    
+    // Show loading
+    document.getElementById('reportLoading').style.display = 'block';
+    document.getElementById('reportResults').style.display = 'none';
+    document.getElementById('exportExcelBtn').style.display = 'none';
+    
+    // Get filter parameters
+    const filters = getFilterParameters();
+    
+    // Make API call
+    fetch(`/api/reports/${reportType}?${new URLSearchParams(filters)}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                currentReportData = data;
+                displayReportResults(data);
+            } else {
+                showError('Lỗi khi tạo báo cáo: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Có lỗi xảy ra khi tạo báo cáo');
+        })
+        .finally(() => {
+            document.getElementById('reportLoading').style.display = 'none';
+        });
+}
+
+// Get filter parameters
+function getFilterParameters() {
+    const form = document.getElementById('reportFilterForm');
+    const formData = new FormData(form);
+    const params = {};
+    
+    for (let [key, value] of formData.entries()) {
+        if (value) {
+            params[key] = value;
+        }
+    }
+    
+    return params;
+}
+
+// Display report results
+function displayReportResults(data) {
+    const resultsDiv = document.getElementById('reportResults');
+    resultsDiv.style.display = 'block';
+    
+    let html = '<div class="table-responsive">';
+    
+    if (data.reports) {
+        // Comprehensive report with multiple sheets
+        html += '<h6>Báo cáo tổng hợp</h6>';
+        html += '<ul class="nav nav-tabs" id="reportTabs" role="tablist">';
+        
+        const tabs = [
+            { id: 'candidate_progress', name: 'Tiến độ ứng viên' },
+            { id: 'position_performance', name: 'Hiệu suất vị trí' },
+            { id: 'interviewer_performance', name: 'Hiệu suất phỏng vấn' },
+            { id: 'executive_summary', name: 'Quyết định điều hành' },
+            { id: 'funnel_analysis', name: 'Phân tích funnel' }
+        ];
+        
+        tabs.forEach((tab, index) => {
+            html += `<li class="nav-item" role="presentation">
+                <button class="nav-link ${index === 0 ? 'active' : ''}" id="${tab.id}-tab" data-bs-toggle="tab" 
+                        data-bs-target="#${tab.id}" type="button" role="tab">
+                    ${tab.name}
+                </button>
+            </li>`;
+        });
+        
+        html += '</ul>';
+        html += '<div class="tab-content" id="reportTabContent">';
+        
+        tabs.forEach((tab, index) => {
+            const tabData = data.reports[tab.id] || [];
+            html += `<div class="tab-pane fade ${index === 0 ? 'show active' : ''}" id="${tab.id}" role="tabpanel">
+                ${generateTableHtml(tabData)}
+            </div>`;
+        });
+        
+        html += '</div>';
+    } else {
+        // Single report
+        html += generateTableHtml(data.data || []);
+    }
+    
+    html += '</div>';
+    resultsDiv.innerHTML = html;
+    
+    // Show export button
+    document.getElementById('exportExcelBtn').style.display = 'inline-block';
+}
+
+// Generate table HTML
+function generateTableHtml(data) {
+    if (!data || data.length === 0) {
+        return '<p class="text-muted">Không có dữ liệu</p>';
+    }
+    
+    let html = '<table class="table table-striped table-hover">';
+    
+    // Header
+    html += '<thead class="table-dark"><tr>';
+    for (let key in data[0]) {
+        html += `<th>${key}</th>`;
+    }
+    html += '</tr></thead>';
+    
+    // Body
+    html += '<tbody>';
+    data.forEach(row => {
+        html += '<tr>';
+        for (let key in row) {
+            let value = row[key];
+            if (typeof value === 'number') {
+                value = value.toFixed(2);
+            }
+            html += `<td>${value}</td>`;
+        }
+        html += '</tr>';
+    });
+    html += '</tbody>';
+    
+    html += '</table>';
+    return html;
+}
+
+// Apply filters
+function applyFilters() {
+    // This would trigger a report refresh
+    console.log('Applying filters...');
+}
+
+// Clear filters
+function clearFilters() {
+    document.getElementById('reportFilterForm').reset();
+}
+
+// Export to Excel
+function exportToExcel() {
+    if (!currentReportType || !currentReportData) {
+        showError('Không có dữ liệu để xuất');
+        return;
+    }
+    
+    const filters = getFilterParameters();
+    const url = `/reports/${currentReportType}?export=excel&${new URLSearchParams(filters)}`;
+    
+    // Create temporary link and click it
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${currentReportType}_report.xlsx`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+// Export to PDF
+function exportToPDF() {
+    showError('Tính năng xuất PDF đang được phát triển');
+}
+
+// Schedule report
+function scheduleReport(frequency) {
+    // This would open a scheduling modal
+    alert(`Báo cáo ${frequency} đã được lên lịch`);
+}
+
+// Show error
+function showError(message) {
+    const resultsDiv = document.getElementById('reportResults');
+    resultsDiv.style.display = 'block';
+    resultsDiv.innerHTML = `<div class="alert alert-danger">${message}</div>`;
+}
+
+// Initialize date inputs with default values
+document.addEventListener('DOMContentLoaded', function() {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today.getTime() - (30 * 24 * 60 * 60 * 1000));
+    
+    document.getElementById('date_from').value = thirtyDaysAgo.toISOString().split('T')[0];
+    document.getElementById('date_to').value = today.toISOString().split('T')[0];
+});
+</script>
+{% endblock %} 

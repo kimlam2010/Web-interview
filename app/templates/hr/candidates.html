@@ -1,0 +1,363 @@
+{% extends "base.html" %}
+
+{% block title %}Candidate Management - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Candidate Management</h1>
+            <p class="text-muted">Manage candidates and their recruitment progress</p>
+        </div>
+        <div>
+            <a href="{{ url_for('hr.add_candidate') }}" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Add Candidate
+            </a>
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#importModal">
+                <i class="fas fa-upload me-2"></i>Import
+            </button>
+            <a href="{{ url_for('hr.export_candidates') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-download me-2"></i>Export
+            </a>
+        </div>
+    </div>
+
+    <!-- Search and Filter Form -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="search_term" class="form-label">Search</label>
+                    <input type="text" class="form-control" id="search_term" name="search_term" 
+                           value="{{ search_term }}" placeholder="Name, email, phone...">
+                </div>
+                <div class="col-md-2">
+                    <label for="position_filter" class="form-label">Position</label>
+                    <select class="form-select" id="position_filter" name="position_filter">
+                        <option value="">All Positions</option>
+                        {% for position in positions %}
+                        <option value="{{ position.id }}" {% if position_filter|string == position.id|string %}selected{% endif %}>
+                            {{ position.title }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="status_filter" class="form-label">Status</label>
+                    <select class="form-select" id="status_filter" name="status_filter">
+                        <option value="">All Status</option>
+                        <option value="pending" {% if status_filter == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="step1_completed" {% if status_filter == 'step1_completed' %}selected{% endif %}>Step 1 Completed</option>
+                        <option value="step2_completed" {% if status_filter == 'step2_completed' %}selected{% endif %}>Step 2 Completed</option>
+                        <option value="hired" {% if status_filter == 'hired' %}selected{% endif %}>Hired</option>
+                        <option value="rejected" {% if status_filter == 'rejected' %}selected{% endif %}>Rejected</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="date_from" class="form-label">From Date</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from" value="{{ date_from }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="date_to" class="form-label">To Date</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to" value="{{ date_to }}">
+                </div>
+                <div class="col-md-1 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Candidates Table -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Candidates ({{ candidates.total }})</h5>
+            <div>
+                <button class="btn btn-sm btn-outline-danger" id="bulkDeleteBtn" style="display: none;">
+                    <i class="fas fa-trash me-1"></i>Delete Selected
+                </button>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if candidates.items %}
+            <form id="bulkForm" method="POST" action="{{ url_for('hr.bulk_delete_candidates') }}">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="selectAll" class="form-check-input">
+                                </th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for candidate in candidates.items %}
+                            <tr>
+                                <td>
+                                    <input type="checkbox" name="candidate_ids" value="{{ candidate.id }}" 
+                                           class="form-check-input candidate-checkbox">
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-sm me-3">
+                                            <div class="avatar-title bg-primary rounded-circle">
+                                                {{ candidate.first_name[0] }}{{ candidate.last_name[0] }}
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">{{ candidate.get_full_name() }}</h6>
+                                            {% if candidate.cv_filename %}
+                                            <small class="text-muted">
+                                                <i class="fas fa-file-pdf me-1"></i>CV uploaded
+                                            </small>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>{{ candidate.email }}</td>
+                                <td>{{ candidate.phone }}</td>
+                                <td>
+                                    <span class="badge bg-info">{{ candidate.position.title }}</span>
+                                </td>
+                                <td>
+                                    {% set status_colors = {
+                                        'pending': 'warning',
+                                        'step1_completed': 'info',
+                                        'step2_completed': 'primary',
+                                        'hired': 'success',
+                                        'rejected': 'danger'
+                                    } %}
+                                    <span class="badge bg-{{ status_colors.get(candidate.status, 'secondary') }}">
+                                        {{ candidate.status.replace('_', ' ').title() }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <small class="text-muted">
+                                        {{ candidate.created_at.strftime('%Y-%m-%d') }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-sm btn-outline-primary dropdown-toggle" 
+                                                data-bs-toggle="dropdown">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="{{ url_for('hr.edit_candidate', candidate_id=candidate.id) }}">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="#" onclick="viewCandidate({{ candidate.id }})">
+                                                    <i class="fas fa-eye me-2"></i>View Details
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('hr.regenerate_credentials', candidate_id=candidate.id) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" class="dropdown-item" 
+                                                            onclick="return confirm('Generate new credentials?')">
+                                                        <i class="fas fa-key me-2"></i>New Credentials
+                                                    </button>
+                                                </form>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
+                                                <form method="POST" action="{{ url_for('hr.delete_candidate', candidate_id=candidate.id) }}" 
+                                                      style="display: inline;">
+                                                    <button type="submit" class="dropdown-item text-danger" 
+                                                            onclick="return confirm('Are you sure you want to delete this candidate?')">
+                                                        <i class="fas fa-trash me-2"></i>Delete
+                                                    </button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </form>
+
+            <!-- Pagination -->
+            {% if candidates.pages > 1 %}
+            <nav aria-label="Candidate pagination">
+                <ul class="pagination justify-content-center">
+                    {% if candidates.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('hr.candidate_management', page=candidates.prev_num, **request.args) }}">
+                            Previous
+                        </a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for page_num in candidates.iter_pages() %}
+                        {% if page_num %}
+                            {% if page_num != candidates.page %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('hr.candidate_management', page=page_num, **request.args) }}">
+                                    {{ page_num }}
+                                </a>
+                            </li>
+                            {% else %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ page_num }}</span>
+                            </li>
+                            {% endif %}
+                        {% else %}
+                        <li class="page-item disabled">
+                            <span class="page-link">...</span>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if candidates.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="{{ url_for('hr.candidate_management', page=candidates.next_num, **request.args) }}">
+                            Next
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                <h5 class="text-muted">No candidates found</h5>
+                <p class="text-muted">Try adjusting your search criteria or add a new candidate.</p>
+                <a href="{{ url_for('hr.add_candidate') }}" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Add First Candidate
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Candidates</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{{ url_for('hr.import_candidates') }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="csv_file" class="form-label">CSV File</label>
+                        <input type="file" class="form-control" id="csv_file" name="csv_file" accept=".csv" required>
+                        <div class="form-text">Upload a CSV file with candidate data</div>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Import Candidates</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Candidate Details Modal -->
+<div class="modal fade" id="candidateModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Candidate Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="candidateModalBody">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Select all functionality
+document.getElementById('selectAll').addEventListener('change', function() {
+    const checkboxes = document.querySelectorAll('.candidate-checkbox');
+    checkboxes.forEach(checkbox => {
+        checkbox.checked = this.checked;
+    });
+    updateBulkDeleteButton();
+});
+
+// Individual checkbox change
+document.querySelectorAll('.candidate-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updateBulkDeleteButton);
+});
+
+function updateBulkDeleteButton() {
+    const checkedBoxes = document.querySelectorAll('.candidate-checkbox:checked');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    
+    if (checkedBoxes.length > 0) {
+        bulkDeleteBtn.style.display = 'inline-block';
+        bulkDeleteBtn.textContent = `Delete Selected (${checkedBoxes.length})`;
+    } else {
+        bulkDeleteBtn.style.display = 'none';
+    }
+}
+
+// Bulk delete functionality
+document.getElementById('bulkDeleteBtn').addEventListener('click', function() {
+    const checkedBoxes = document.querySelectorAll('.candidate-checkbox:checked');
+    if (checkedBoxes.length === 0) {
+        alert('Please select candidates to delete.');
+        return;
+    }
+    
+    if (confirm(`Are you sure you want to delete ${checkedBoxes.length} candidate(s)?`)) {
+        document.getElementById('bulkForm').submit();
+    }
+});
+
+// View candidate details
+function viewCandidate(candidateId) {
+    // This would typically make an AJAX call to get candidate details
+    // For now, we'll just show a placeholder
+    document.getElementById('candidateModalBody').innerHTML = `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading candidate details...</p>
+        </div>
+    `;
+    
+    const modal = new bootstrap.Modal(document.getElementById('candidateModal'));
+    modal.show();
+    
+    // In a real implementation, you would make an AJAX call here
+    // fetch(`/hr/candidates/${candidateId}/details`)
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         document.getElementById('candidateModalBody').innerHTML = data.html;
+    //     });
+}
+
+// Auto-submit form on filter change
+document.querySelectorAll('#position_filter, #status_filter').forEach(select => {
+    select.addEventListener('change', function() {
+        this.form.submit();
+    });
+});
+</script>
+{% endblock %} 

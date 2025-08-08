@@ -1,0 +1,314 @@
+{% extends "base.html" %}
+
+{% block title %}Thiết lập phỏng vấn - Step 2{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calendar-plus me-2"></i>
+                        Thiết lập phỏng vấn Step 2
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Navigation Tabs -->
+                    <ul class="nav nav-tabs" id="interviewTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="candidates-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#candidates" type="button" role="tab">
+                                <i class="fas fa-users me-2"></i>Ứng viên sẵn sàng
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="scheduled-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#scheduled" type="button" role="tab">
+                                <i class="fas fa-calendar-check me-2"></i>Đã lên lịch
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="questions-tab" data-bs-toggle="tab" 
+                                    data-bs-target="#questions" type="button" role="tab">
+                                <i class="fas fa-question-circle me-2"></i>Ngân hàng câu hỏi
+                            </button>
+                        </li>
+                    </ul>
+
+                    <!-- Tab Content -->
+                    <div class="tab-content mt-3" id="interviewTabsContent">
+                        <!-- Candidates Ready Tab -->
+                        <div class="tab-pane fade show active" id="candidates" role="tabpanel">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5 class="mb-3">Ứng viên đã hoàn thành Step 1</h5>
+                                    
+                                    {% if candidates %}
+                                    <div class="table-responsive">
+                                        <table class="table table-hover" id="candidatesTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Ứng viên</th>
+                                                    <th>Vị trí</th>
+                                                    <th>Điểm Step 1</th>
+                                                    <th>Trạng thái</th>
+                                                    <th>Ngày hoàn thành</th>
+                                                    <th>Thao tác</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for candidate in candidates %}
+                                                {% set step1_result = candidate.assessment_results|selectattr("step", "equalto", 1)|first %}
+                                                <tr>
+                                                    <td>
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="avatar-sm bg-primary rounded-circle d-flex align-items-center justify-content-center me-3">
+                                                                <span class="text-white fw-bold">{{ candidate.name[0] }}</span>
+                                                            </div>
+                                                            <div>
+                                                                <h6 class="mb-0">{{ candidate.name }}</h6>
+                                                                <small class="text-muted">{{ candidate.email }}</small>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <span class="badge bg-info">{{ candidate.position.title }}</span>
+                                                        <br><small class="text-muted">{{ candidate.position.department }}</small>
+                                                    </td>
+                                                    <td>
+                                                        {% if step1_result %}
+                                                        <span class="fw-bold {% if step1_result.score >= 70 %}text-success{% elif step1_result.score >= 50 %}text-warning{% else %}text-danger{% endif %}">
+                                                            {{ "%.1f"|format(step1_result.score) }}%
+                                                        </span>
+                                                        {% else %}
+                                                        <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if step1_result %}
+                                                        {% if step1_result.status == 'passed' %}
+                                                        <span class="badge bg-success">Đạt</span>
+                                                        {% elif step1_result.status == 'manual_review' %}
+                                                        <span class="badge bg-warning">Cần review</span>
+                                                        {% else %}
+                                                        <span class="badge bg-danger">Không đạt</span>
+                                                        {% endif %}
+                                                        {% else %}
+                                                        <span class="badge bg-secondary">Chưa làm</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if step1_result %}
+                                                        {{ step1_result.completed_at.strftime('%d/%m/%Y %H:%M') if step1_result.completed_at else 'N/A' }}
+                                                        {% else %}
+                                                        <span class="text-muted">N/A</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if step1_result and step1_result.status in ['passed', 'manual_review'] %}
+                                                        <div class="btn-group" role="group">
+                                                            <a href="{{ url_for('interview.candidate_interview_setup', candidate_id=candidate.id) }}" 
+                                                               class="btn btn-sm btn-primary">
+                                                                <i class="fas fa-calendar-plus me-1"></i>Lên lịch
+                                                            </a>
+                                                            <button type="button" class="btn btn-sm btn-outline-info" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#candidateDetailModal{{ candidate.id }}">
+                                                                <i class="fas fa-eye me-1"></i>Chi tiết
+                                                            </button>
+                                                        </div>
+                                                        {% else %}
+                                                        <span class="text-muted">Chưa sẵn sàng</span>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% else %}
+                                    <div class="text-center py-5">
+                                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">Chưa có ứng viên nào sẵn sàng cho Step 2</h5>
+                                        <p class="text-muted">Ứng viên cần hoàn thành và đạt Step 1 trước khi có thể lên lịch phỏng vấn.</p>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Scheduled Interviews Tab -->
+                        <div class="tab-pane fade" id="scheduled" role="tabpanel">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5 class="mb-3">Phỏng vấn đã lên lịch</h5>
+                                    
+                                    <div class="row" id="scheduledInterviews">
+                                        <!-- This will be populated via AJAX -->
+                                        <div class="col-12 text-center">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Questions Bank Tab -->
+                        <div class="tab-pane fade" id="questions" role="tabpanel">
+                            <div class="row">
+                                <div class="col-12">
+                                    <h5 class="mb-3">Ngân hàng câu hỏi Step 2</h5>
+                                    
+                                    {% for category, questions in questions_by_category.items() %}
+                                    <div class="card mb-3">
+                                        <div class="card-header">
+                                            <h6 class="mb-0">
+                                                <i class="fas fa-folder me-2"></i>{{ category }}
+                                                <span class="badge bg-secondary ms-2">{{ questions|length }} câu</span>
+                                            </h6>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                {% for question in questions[:3] %}
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="border rounded p-3">
+                                                        <h6 class="mb-2">{{ question.content[:100] }}{% if question.content|length > 100 %}...{% endif %}</h6>
+                                                        <div class="d-flex justify-content-between align-items-center">
+                                                            <small class="text-muted">
+                                                                <i class="fas fa-clock me-1"></i>{{ question.time_limit or 5 }} phút
+                                                            </small>
+                                                            <span class="badge bg-light text-dark">
+                                                                {{ question.difficulty or 'Medium' }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                            {% if questions|length > 3 %}
+                                            <div class="text-center mt-3">
+                                                <button class="btn btn-outline-primary btn-sm" 
+                                                        onclick="showAllQuestions('{{ category }}')">
+                                                    Xem tất cả {{ questions|length }} câu hỏi
+                                                </button>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Candidate Detail Modal -->
+{% for candidate in candidates %}
+<div class="modal fade" id="candidateDetailModal{{ candidate.id }}" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chi tiết ứng viên - {{ candidate.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Thông tin cá nhân</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Email:</strong> {{ candidate.email }}</li>
+                            <li><strong>Điện thoại:</strong> {{ candidate.phone }}</li>
+                            <li><strong>Vị trí:</strong> {{ candidate.position.title }}</li>
+                            <li><strong>Phòng ban:</strong> {{ candidate.position.department }}</li>
+                            <li><strong>Cấp độ:</strong> {{ candidate.position.level }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Kết quả Step 1</h6>
+                        {% set step1_result = candidate.assessment_results|selectattr("step", "equalto", 1)|first %}
+                        {% if step1_result %}
+                        <ul class="list-unstyled">
+                            <li><strong>Điểm số:</strong> {{ "%.1f"|format(step1_result.score) }}%</li>
+                            <li><strong>Trạng thái:</strong> 
+                                {% if step1_result.status == 'passed' %}
+                                <span class="badge bg-success">Đạt</span>
+                                {% elif step1_result.status == 'manual_review' %}
+                                <span class="badge bg-warning">Cần review</span>
+                                {% else %}
+                                <span class="badge bg-danger">Không đạt</span>
+                                {% endif %}
+                            </li>
+                            <li><strong>Thời gian làm bài:</strong> {{ step1_result.time_taken // 60 }} phút</li>
+                            <li><strong>Ngày hoàn thành:</strong> {{ step1_result.completed_at.strftime('%d/%m/%Y %H:%M') if step1_result.completed_at else 'N/A' }}</li>
+                        </ul>
+                        {% else %}
+                        <p class="text-muted">Chưa có kết quả Step 1</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                {% if step1_result and step1_result.status in ['passed', 'manual_review'] %}
+                <a href="{{ url_for('interview.candidate_interview_setup', candidate_id=candidate.id) }}" 
+                   class="btn btn-primary">
+                    <i class="fas fa-calendar-plus me-1"></i>Lên lịch phỏng vấn
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize data table
+    const candidatesTable = document.getElementById('candidatesTable');
+    if (candidatesTable) {
+        new DataTable(candidatesTable, {
+            pageLength: 10,
+            order: [[4, 'desc']] // Sort by completion date
+        });
+    }
+    
+    // Load scheduled interviews when tab is clicked
+    document.getElementById('scheduled-tab').addEventListener('click', function() {
+        loadScheduledInterviews();
+    });
+});
+
+function loadScheduledInterviews() {
+    const container = document.getElementById('scheduledInterviews');
+    container.innerHTML = '<div class="col-12 text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div></div>';
+    
+    fetch('/interview/scheduled')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                container.innerHTML = data.html;
+            } else {
+                container.innerHTML = '<div class="col-12 text-center"><p class="text-muted">Không có phỏng vấn nào đã lên lịch</p></div>';
+            }
+        })
+        .catch(error => {
+            console.error('Error loading scheduled interviews:', error);
+            container.innerHTML = '<div class="col-12 text-center"><p class="text-danger">Lỗi khi tải dữ liệu</p></div>';
+        });
+}
+
+function showAllQuestions(category) {
+    // Implementation for showing all questions in a category
+    console.log('Show all questions for category:', category);
+}
+</script>
+{% endblock %} 

@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mekong Technology - Assessment Result</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .result-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .score-card {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+        .status-badge.passed {
+            background: #d4edda;
+            color: #155724;
+        }
+        .status-badge.manual_review {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-badge.failed {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 4px solid rgba(255, 255, 255, 0.3);
+        }
+        .question-score {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+        }
+        .question-score.correct {
+            border-left-color: #28a745;
+        }
+        .question-score.incorrect {
+            border-left-color: #dc3545;
+        }
+        .next-steps {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .btn-logout {
+            background: linear-gradient(45deg, #6c757d, #495057);
+            border: none;
+            border-radius: 10px;
+            padding: 12px 30px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.4);
+        }
+        .score-breakdown {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="result-container p-5">
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <h2 class="fw-bold text-dark mb-2">
+                            <i class="fas fa-trophy text-primary me-2"></i>
+                            Assessment Complete
+                        </h2>
+                        <h5 class="text-muted mb-3">Thank you for completing the assessment</h5>
+                        <p class="text-muted">
+                            Your assessment has been submitted successfully. Here are your results:
+                        </p>
+                    </div>
+
+                    <!-- Score Card -->
+                    <div class="score-card">
+                        <div class="status-badge {{ result.status }}">
+                            {% if result.status == 'passed' %}
+                                <i class="fas fa-check-circle me-2"></i>Passed
+                            {% elif result.status == 'manual_review' %}
+                                <i class="fas fa-clock me-2"></i>Under Review
+                            {% else %}
+                                <i class="fas fa-times-circle me-2"></i>Not Passed
+                            {% endif %}
+                        </div>
+                        
+                        <div class="score-circle">
+                            {{ "%.0f"|format(result.percentage) }}%
+                        </div>
+                        
+                        <h4 class="mb-2">{{ candidate.first_name }} {{ candidate.last_name }}</h4>
+                        <p class="mb-0">{{ candidate.position.title if candidate.position else 'Position' }}</p>
+                        
+                        <div class="row mt-4">
+                            <div class="col-md-4">
+                                <h6 class="mb-1">Score</h6>
+                                <h5 class="mb-0">{{ result.score }}/{{ result.max_score }}</h5>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="mb-1">Percentage</h6>
+                                <h5 class="mb-0">{{ "%.1f"|format(result.percentage) }}%</h5>
+                            </div>
+                            <div class="col-md-4">
+                                <h6 class="mb-1">Status</h6>
+                                <h5 class="mb-0">
+                                    {% if result.status == 'passed' %}
+                                        <span class="text-success">Passed</span>
+                                    {% elif result.status == 'manual_review' %}
+                                        <span class="text-warning">Review</span>
+                                    {% else %}
+                                        <span class="text-danger">Failed</span>
+                                    {% endif %}
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Score Breakdown -->
+                    <div class="score-breakdown">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-chart-bar text-primary me-2"></i>
+                            Detailed Score Breakdown
+                        </h5>
+                        
+                        {% set question_scores = result.question_scores|from_json %}
+                        {% for score_data in question_scores %}
+                            <div class="question-score {{ 'correct' if score_data.score > 0 else 'incorrect' }}">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div class="flex-grow-1">
+                                        <h6 class="fw-bold mb-2">Question {{ loop.index }}</h6>
+                                        <p class="mb-2">{{ score_data.question.content|truncate(100) }}</p>
+                                        
+                                        {% if score_data.question.question_type == 'multiple_choice' %}
+                                            <p class="mb-1">
+                                                <strong>Your Answer:</strong> 
+                                                <span class="{{ 'text-success' if score_data.score > 0 else 'text-danger' }}">
+                                                    {{ score_data.answer or 'No answer' }}
+                                                </span>
+                                            </p>
+                                            {% if score_data.score == 0 %}
+                                                <p class="mb-0 small text-muted">
+                                                    <strong>Correct Answer:</strong> {{ score_data.question.correct_answer }}
+                                                </p>
+                                            {% endif %}
+                                        {% else %}
+                                            <p class="mb-0">
+                                                <strong>Your Answer:</strong> 
+                                                <span class="text-muted">{{ score_data.answer|truncate(50) or 'No answer' }}</span>
+                                            </p>
+                                        {% endif %}
+                                    </div>
+                                    <div class="text-end">
+                                        <span class="badge {{ 'bg-success' if score_data.score > 0 else 'bg-danger' }}">
+                                            {{ score_data.score }}/{{ score_data.max_score }}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="next-steps">
+                        <h5 class="fw-bold mb-3">
+                            <i class="fas fa-arrow-right text-primary me-2"></i>
+                            Next Steps
+                        </h5>
+                        
+                        {% if result.status == 'passed' %}
+                            <div class="alert alert-success">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Congratulations!
+                                </h6>
+                                <p class="mb-2">You have successfully passed the assessment. Our HR team will contact you within 2-3 business days to schedule the next step in the recruitment process.</p>
+                                <ul class="mb-0">
+                                    <li>Technical interview with our team</li>
+                                    <li>Final interview with executives</li>
+                                    <li>Offer discussion and onboarding</li>
+                                </ul>
+                            </div>
+                        {% elif result.status == 'manual_review' %}
+                            <div class="alert alert-warning">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-clock me-2"></i>
+                                    Under Review
+                                </h6>
+                                <p class="mb-2">Your assessment is currently under manual review by our team. We will evaluate your responses and get back to you within 3-5 business days.</p>
+                                <ul class="mb-0">
+                                    <li>Manual evaluation of your answers</li>
+                                    <li>Consideration of your experience and skills</li>
+                                    <li>Decision on next steps</li>
+                                </ul>
+                            </div>
+                        {% else %}
+                            <div class="alert alert-info">
+                                <h6 class="fw-bold">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Thank You
+                                </h6>
+                                <p class="mb-2">Thank you for your interest in joining our team. While your current assessment score doesn't meet our requirements, we encourage you to:</p>
+                                <ul class="mb-0">
+                                    <li>Continue developing your skills</li>
+                                    <li>Apply for future opportunities</li>
+                                    <li>Stay connected with our company</li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="text-center mt-4">
+                        <p class="mb-2">
+                            <strong>Questions?</strong> Contact our HR team at 
+                            <a href="mailto:hr@mekongtech.com" class="text-decoration-none">hr@mekongtech.com</a>
+                        </p>
+                        <p class="small text-muted mb-0">
+                            Assessment completed on {{ result.end_time.strftime('%B %d, %Y at %I:%M %p') }}
+                        </p>
+                    </div>
+
+                    <!-- Logout Button -->
+                    <div class="text-center mt-4">
+                        <a href="{{ url_for('candidate_auth.candidate_logout') }}" class="btn btn-logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Prevent going back to assessment
+        window.history.pushState(null, null, window.location.href);
+        window.onpopstate = function() {
+            window.history.pushState(null, null, window.location.href);
+        };
+
+        // Auto-logout after 5 minutes
+        setTimeout(function() {
+            alert('Session will expire in 1 minute. Please save any important information.');
+        }, 240000); // 4 minutes
+
+        setTimeout(function() {
+            window.location.href = '{{ url_for("candidate_auth.candidate_logout") }}';
+        }, 300000); // 5 minutes
+    </script>
+</body>
+</html> 

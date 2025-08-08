@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}Add Candidate - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Add New Candidate</h1>
+            <p class="text-muted">Add a new candidate to the recruitment system</p>
+        </div>
+        <div>
+            <a href="{{ url_for('hr.candidate_management') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Candidates
+            </a>
+        </div>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-user-plus me-2"></i>Candidate Information
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="row">
+                            <!-- Personal Information -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3 text-primary">Personal Information</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.first_name.id }}" class="form-label">
+                                        <i class="fas fa-user me-2"></i>First Name *
+                                    </label>
+                                    {{ form.first_name(class="form-control", placeholder="Enter first name") }}
+                                    {% if form.first_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.first_name.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.last_name.id }}" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Last Name *
+                                    </label>
+                                    {{ form.last_name(class="form-control", placeholder="Enter last name") }}
+                                    {% if form.last_name.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.last_name.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.email.id }}" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email Address *
+                                    </label>
+                                    {{ form.email(class="form-control", placeholder="Enter email address") }}
+                                    {% if form.email.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.email.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.phone.id }}" class="form-label">
+                                        <i class="fas fa-phone me-2"></i>Phone Number *
+                                    </label>
+                                    {{ form.phone(class="form-control", placeholder="Enter phone number") }}
+                                    {% if form.phone.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.phone.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            <!-- Position and Documents -->
+                            <div class="col-md-6">
+                                <h6 class="mb-3 text-primary">Position & Documents</h6>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.position_id.id }}" class="form-label">
+                                        <i class="fas fa-briefcase me-2"></i>Position *
+                                    </label>
+                                    {{ form.position_id(class="form-select") }}
+                                    {% if form.position_id.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.position_id.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.cv_file.id }}" class="form-label">
+                                        <i class="fas fa-file-upload me-2"></i>CV/Resume
+                                    </label>
+                                    {{ form.cv_file(class="form-control", accept=".pdf,.doc,.docx") }}
+                                    <div class="form-text">
+                                        Accepted formats: PDF, DOC, DOCX (Max 5MB)
+                                    </div>
+                                    {% if form.cv_file.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.cv_file.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ form.notes.id }}" class="form-label">
+                                        <i class="fas fa-sticky-note me-2"></i>Notes
+                                    </label>
+                                    {{ form.notes(class="form-control", rows="4", placeholder="Additional notes about the candidate...") }}
+                                    {% if form.notes.errors %}
+                                        <div class="invalid-feedback d-block">
+                                            {% for error in form.notes.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Information Box -->
+                        <div class="alert alert-info mt-4">
+                            <h6 class="alert-heading">
+                                <i class="fas fa-info-circle me-2"></i>What happens next?
+                            </h6>
+                            <ul class="mb-0">
+                                <li>Candidate will receive temporary login credentials</li>
+                                <li>Assessment link will be generated automatically</li>
+                                <li>You can track progress through the candidate management page</li>
+                                <li>CV will be stored securely and accessible to interviewers</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Submit Buttons -->
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ url_for('hr.candidate_management') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                            <div>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>{{ form.submit.label }}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Form validation
+(function() {
+    'use strict';
+    window.addEventListener('load', function() {
+        var forms = document.getElementsByClassName('needs-validation');
+        var validation = Array.prototype.filter.call(forms, function(form) {
+            form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    }, false);
+})();
+
+// File size validation
+document.getElementById('{{ form.cv_file.id }}').addEventListener('change', function() {
+    const file = this.files[0];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    
+    if (file && file.size > maxSize) {
+        alert('File size must be less than 5MB');
+        this.value = '';
+    }
+});
+
+// Auto-format phone number
+document.getElementById('{{ form.phone.id }}').addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    if (value.length > 0) {
+        if (value.length <= 3) {
+            value = value;
+        } else if (value.length <= 6) {
+            value = value.slice(0, 3) + '-' + value.slice(3);
+        } else {
+            value = value.slice(0, 3) + '-' + value.slice(3, 6) + '-' + value.slice(6, 10);
+        }
+    }
+    this.value = value;
+});
+</script>
+{% endblock %} 

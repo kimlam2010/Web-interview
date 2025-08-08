@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+
+{% block title %}Quản lý câu hỏi Step 2 - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Quản lý câu hỏi Step 2 (Technical Interview)
+                    </h4>
+                    <div class="btn-group">
+                        <a href="{{ url_for('step2_questions.create_step2_question') }}" 
+                           class="btn btn-primary">
+                            <i class="fas fa-plus me-1"></i>Tạo câu hỏi mới
+                        </a>
+                        <a href="{{ url_for('step2_questions.import_step2_questions') }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-upload me-1"></i>Import
+                        </a>
+                        <a href="{{ url_for('step2_questions.export_step2_questions') }}" 
+                           class="btn btn-info">
+                            <i class="fas fa-download me-1"></i>Export
+                        </a>
+                        <a href="{{ url_for('step2_questions.question_statistics') }}" 
+                           class="btn btn-warning">
+                            <i class="fas fa-chart-bar me-1"></i>Thống kê
+                        </a>
+                    </div>
+                </div>
+                
+                <div class="card-body">
+                    <!-- Filter Form -->
+                    <form method="GET" class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <label for="category" class="form-label">Danh mục</label>
+                            <select name="category" id="category" class="form-select">
+                                <option value="">Tất cả danh mục</option>
+                                {% for key, value in categories.items() %}
+                                <option value="{{ key }}" {% if request.args.get('category') == key %}selected{% endif %}>
+                                    {{ value }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="difficulty" class="form-label">Độ khó</label>
+                            <select name="difficulty" id="difficulty" class="form-select">
+                                <option value="">Tất cả độ khó</option>
+                                {% for key, value in difficulty_levels.items() %}
+                                <option value="{{ key }}" {% if request.args.get('difficulty') == key %}selected{% endif %}>
+                                    {{ value }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="position_id" class="form-label">Vị trí</label>
+                            <select name="position_id" id="position_id" class="form-select">
+                                <option value="">Tất cả vị trí</option>
+                                {% for position in positions %}
+                                <option value="{{ position.id }}" {% if request.args.get('position_id')|int == position.id %}selected{% endif %}>
+                                    {{ position.title }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-primary me-2">
+                                <i class="fas fa-search me-1"></i>Lọc
+                            </button>
+                            <a href="{{ url_for('step2_questions.list_step2_questions') }}" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Xóa bộ lọc
+                            </a>
+                        </div>
+                    </form>
+
+                    <!-- Statistics Summary -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Tổng câu hỏi</h5>
+                                    <h3>{{ statistics.total_questions }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Đang hoạt động</h5>
+                                    <h3>{{ questions.items|selectattr('is_active')|list|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Thời gian TB</h5>
+                                    <h3>{{ "%.1f"|format(statistics.average_time_allocation) }} phút</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body">
+                                    <h5 class="card-title">Vị trí cụ thể</h5>
+                                    <h3>{{ questions.items|selectattr('position_specific')|list|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Questions Table -->
+                    <form method="POST" action="{{ url_for('step2_questions.bulk_operations') }}" id="bulkForm">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectAll" class="form-check-input">
+                                        </th>
+                                        <th>ID</th>
+                                        <th>Danh mục</th>
+                                        <th>Nội dung</th>
+                                        <th>Độ khó</th>
+                                        <th>Thời gian</th>
+                                        <th>Vị trí</th>
+                                        <th>Trạng thái</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for question in questions.items %}
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" name="question_ids" value="{{ question.id }}" 
+                                                   class="form-check-input question-checkbox">
+                                        </td>
+                                        <td>{{ question.id }}</td>
+                                        <td>
+                                            <span class="badge bg-secondary">
+                                                {{ categories.get(question.category, question.category) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="text-truncate" style="max-width: 300px;" 
+                                                 title="{{ question.content }}">
+                                                {{ question.content[:100] }}{% if question.content|length > 100 %}...{% endif %}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% set difficulty_color = {
+                                                'beginner': 'success',
+                                                'intermediate': 'info', 
+                                                'advanced': 'warning',
+                                                'expert': 'danger'
+                                            } %}
+                                            <span class="badge bg-{{ difficulty_color.get(question.difficulty, 'secondary') }}">
+                                                {{ difficulty_levels.get(question.difficulty, question.difficulty) }}
+                                            </span>
+                                        </td>
+                                        <td>{{ question.time_allocation }} phút</td>
+                                        <td>
+                                            {% if question.position_specific %}
+                                                <span class="badge bg-primary">Cụ thể</span>
+                                                {% if question.position %}
+                                                    <br><small>{{ question.position.title }}</small>
+                                                {% endif %}
+                                            {% else %}
+                                                <span class="badge bg-secondary">Chung</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if question.is_active %}
+                                                <span class="badge bg-success">Hoạt động</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Vô hiệu</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="btn-group btn-group-sm">
+                                                <a href="{{ url_for('step2_questions.edit_step2_question', question_id=question.id) }}" 
+                                                   class="btn btn-outline-primary" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <button type="button" class="btn btn-outline-danger" 
+                                                        onclick="deleteQuestion({{ question.id }})" title="Xóa">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Bulk Operations -->
+                        <div class="row mt-3">
+                            <div class="col-md-6">
+                                <div class="btn-group">
+                                    <button type="submit" name="action" value="activate" class="btn btn-success">
+                                        <i class="fas fa-check me-1"></i>Kích hoạt
+                                    </button>
+                                    <button type="submit" name="action" value="deactivate" class="btn btn-warning">
+                                        <i class="fas fa-pause me-1"></i>Vô hiệu
+                                    </button>
+                                    <button type="submit" name="action" value="delete" class="btn btn-danger">
+                                        <i class="fas fa-trash me-1"></i>Xóa
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <nav aria-label="Question pagination">
+                                    {{ render_pagination(questions) }}
+                                </nav>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa câu hỏi này không?</p>
+                <p class="text-danger">Hành động này không thể hoàn tác!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <form method="POST" id="deleteForm" style="display: inline;">
+                    <button type="submit" class="btn btn-danger">Xóa</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Select all functionality
+    const selectAll = document.getElementById('selectAll');
+    const questionCheckboxes = document.querySelectorAll('.question-checkbox');
+    
+    selectAll.addEventListener('change', function() {
+        questionCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+    });
+    
+    // Update select all when individual checkboxes change
+    questionCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const checkedCount = document.querySelectorAll('.question-checkbox:checked').length;
+            const totalCount = questionCheckboxes.length;
+            selectAll.checked = checkedCount === totalCount;
+            selectAll.indeterminate = checkedCount > 0 && checkedCount < totalCount;
+        });
+    });
+});
+
+function deleteQuestion(questionId) {
+    if (confirm('Bạn có chắc chắn muốn xóa câu hỏi này không?')) {
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = `/step2/step2/questions/${questionId}/delete`;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+</script>
+{% endblock %} 

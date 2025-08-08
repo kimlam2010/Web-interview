@@ -1,0 +1,344 @@
+{% extends "base.html" %}
+
+{% block title %}Tạo câu hỏi Step 3 - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus me-2"></i>
+                        Tạo câu hỏi Step 3 mới
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="createQuestionForm">
+                        <div class="row">
+                            <!-- Basic Information -->
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Thông tin cơ bản</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="content" class="form-label">Nội dung câu hỏi *</label>
+                                            <textarea class="form-control" id="content" name="content" rows="6" 
+                                                      placeholder="Nhập nội dung câu hỏi..." required></textarea>
+                                            <div class="form-text">Mô tả chi tiết câu hỏi phỏng vấn</div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="question_type" class="form-label">Loại câu hỏi *</label>
+                                                <select class="form-select" id="question_type" name="question_type" required>
+                                                    <option value="">Chọn loại câu hỏi</option>
+                                                    <option value="technical">Kỹ thuật</option>
+                                                    <option value="leadership">Lãnh đạo</option>
+                                                    <option value="cultural">Văn hóa</option>
+                                                    <option value="strategic">Chiến lược</option>
+                                                    <option value="problem_solving">Giải quyết vấn đề</option>
+                                                    <option value="system_design">Thiết kế hệ thống</option>
+                                                    <option value="architecture">Kiến trúc</option>
+                                                    <option value="team_management">Quản lý nhóm</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="category" class="form-label">Danh mục *</label>
+                                                <input type="text" class="form-control" id="category" name="category" 
+                                                       placeholder="Ví dụ: system_design, architecture..." required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="assigned_to" class="form-label">Phân công cho *</label>
+                                                <select class="form-select" id="assigned_to" name="assigned_to" required>
+                                                    <option value="">Chọn người phỏng vấn</option>
+                                                    <option value="cto">CTO</option>
+                                                    <option value="ceo">CEO</option>
+                                                    <option value="both">Cả CTO và CEO</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="position_id" class="form-label">Vị trí áp dụng</label>
+                                                <select class="form-select" id="position_id" name="position_id">
+                                                    <option value="">Tất cả vị trí</option>
+                                                    {% for position in positions %}
+                                                    <option value="{{ position.id }}">{{ position.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Configuration -->
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Cấu hình</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="difficulty_level" class="form-label">Độ khó *</label>
+                                            <select class="form-select" id="difficulty_level" name="difficulty_level" required>
+                                                <option value="">Chọn độ khó</option>
+                                                <option value="beginner">Dễ (Beginner)</option>
+                                                <option value="intermediate">Trung bình (Intermediate)</option>
+                                                <option value="advanced">Khó (Advanced)</option>
+                                                <option value="expert">Chuyên gia (Expert)</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="time_allocation" class="form-label">Thời gian phân bổ (phút)</label>
+                                            <input type="number" class="form-control" id="time_allocation" name="time_allocation" 
+                                                   value="10" min="5" max="60">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="priority_score" class="form-label">Điểm ưu tiên (1-10)</label>
+                                            <input type="number" class="form-control" id="priority_score" name="priority_score" 
+                                                   value="5" min="1" max="10">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Evaluation Weights -->
+                                <div class="card mt-3">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Trọng số đánh giá</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="technical_weight" class="form-label">Kỹ thuật (0.0-1.0)</label>
+                                            <input type="number" class="form-control" id="technical_weight" name="technical_weight" 
+                                                   value="0.6" min="0" max="1" step="0.1">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="leadership_weight" class="form-label">Lãnh đạo (0.0-1.0)</label>
+                                            <input type="number" class="form-control" id="leadership_weight" name="leadership_weight" 
+                                                   value="0.2" min="0" max="1" step="0.1">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="cultural_weight" class="form-label">Văn hóa (0.0-1.0)</label>
+                                            <input type="number" class="form-control" id="cultural_weight" name="cultural_weight" 
+                                                   value="0.2" min="0" max="1" step="0.1">
+                                        </div>
+                                        
+                                        <div class="alert alert-info">
+                                            <small>
+                                                <strong>Tổng trọng số:</strong> <span id="totalWeight">1.0</span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Expected Answers and Scoring -->
+                        <div class="row mt-4">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Điểm chính cần có</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="expected_key_points" class="form-label">Các điểm chính (mỗi dòng một điểm)</label>
+                                            <textarea class="form-control" id="expected_key_points" name="expected_key_points" 
+                                                      rows="8" placeholder="Ví dụ:&#10;- Hiểu rõ về microservices&#10;- Có kinh nghiệm với Docker&#10;- Biết về CI/CD pipeline"></textarea>
+                                            <div class="form-text">Liệt kê các điểm chính mà ứng viên cần thể hiện</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Tiêu chí chấm điểm</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="scoring_rubric" class="form-label">Rubric chấm điểm (JSON)</label>
+                                            <textarea class="form-control" id="scoring_rubric" name="scoring_rubric" 
+                                                      rows="8" placeholder='{
+  "technical_knowledge": {
+    "excellent": "Hiểu sâu và có thể giải thích chi tiết",
+    "good": "Hiểu cơ bản và có thể thảo luận",
+    "fair": "Hiểu sơ bộ",
+    "poor": "Không hiểu hoặc hiểu sai"
+  },
+  "problem_solving": {
+    "excellent": "Đưa ra giải pháp tối ưu",
+    "good": "Đưa ra giải pháp khả thi",
+    "fair": "Có ý tưởng nhưng chưa rõ ràng",
+    "poor": "Không có giải pháp"
+  }
+}'></textarea>
+                                            <div class="form-text">Định nghĩa tiêu chí chấm điểm chi tiết</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Sample Answers -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Câu trả lời mẫu</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="sample_answers" class="form-label">Câu trả lời mẫu (mỗi dòng một câu trả lời)</label>
+                                            <textarea class="form-control" id="sample_answers" name="sample_answers" 
+                                                      rows="6" placeholder="Ví dụ:&#10;- Tôi sẽ sử dụng microservices để tách biệt các chức năng&#10;- Docker giúp đóng gói ứng dụng một cách nhất quán&#10;- CI/CD pipeline tự động hóa quá trình deploy"></textarea>
+                                            <div class="form-text">Các câu trả lời mẫu để tham khảo khi chấm điểm</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('step3_questions.list_step3_questions') }}" 
+                                       class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                                    </a>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-outline-primary" onclick="previewQuestion()">
+                                            <i class="fas fa-eye me-1"></i>Xem trước
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Lưu câu hỏi
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xem trước câu hỏi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" id="previewContent">
+                <!-- Preview content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Weight validation
+function updateTotalWeight() {
+    const technical = parseFloat(document.getElementById('technical_weight').value) || 0;
+    const leadership = parseFloat(document.getElementById('leadership_weight').value) || 0;
+    const cultural = parseFloat(document.getElementById('cultural_weight').value) || 0;
+    const total = technical + leadership + cultural;
+    
+    document.getElementById('totalWeight').textContent = total.toFixed(1);
+    
+    if (total !== 1.0) {
+        document.getElementById('totalWeight').style.color = 'red';
+    } else {
+        document.getElementById('totalWeight').style.color = 'inherit';
+    }
+}
+
+// Add event listeners for weight inputs
+document.getElementById('technical_weight').addEventListener('input', updateTotalWeight);
+document.getElementById('leadership_weight').addEventListener('input', updateTotalWeight);
+document.getElementById('cultural_weight').addEventListener('input', updateTotalWeight);
+
+// Initialize total weight
+updateTotalWeight();
+
+// Form validation
+document.getElementById('createQuestionForm').addEventListener('submit', function(e) {
+    const technical = parseFloat(document.getElementById('technical_weight').value) || 0;
+    const leadership = parseFloat(document.getElementById('leadership_weight').value) || 0;
+    const cultural = parseFloat(document.getElementById('cultural_weight').value) || 0;
+    const total = technical + leadership + cultural;
+    
+    if (Math.abs(total - 1.0) > 0.01) {
+        e.preventDefault();
+        alert('Tổng trọng số phải bằng 1.0!');
+        return false;
+    }
+});
+
+// Preview question
+function previewQuestion() {
+    const content = document.getElementById('content').value;
+    const questionType = document.getElementById('question_type').value;
+    const category = document.getElementById('category').value;
+    const assignedTo = document.getElementById('assigned_to').value;
+    const difficulty = document.getElementById('difficulty_level').value;
+    const timeAllocation = document.getElementById('time_allocation').value;
+    
+    if (!content || !questionType || !category || !assignedTo || !difficulty) {
+        alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
+        return;
+    }
+    
+    const previewHtml = `
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Xem trước câu hỏi</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>Nội dung:</strong>
+                    <p class="mt-2">${content}</p>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Loại:</strong> ${questionType}<br>
+                        <strong>Danh mục:</strong> ${category}<br>
+                        <strong>Phân công:</strong> ${assignedTo.toUpperCase()}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Độ khó:</strong> ${difficulty}<br>
+                        <strong>Thời gian:</strong> ${timeAllocation} phút<br>
+                        <strong>Trọng số:</strong> Technical: ${document.getElementById('technical_weight').value}, 
+                        Leadership: ${document.getElementById('leadership_weight').value}, 
+                        Cultural: ${document.getElementById('cultural_weight').value}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('previewContent').innerHTML = previewHtml;
+    new bootstrap.Modal(document.getElementById('previewModal')).show();
+}
+</script>
+{% endblock %} 

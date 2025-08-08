@@ -1,0 +1,313 @@
+{
+  "cto_questions": [
+    {
+      "id": 1,
+      "category": "Technical Leadership",
+      "question": "Technology Strategy Alignment",
+      "content": "Dự án Mekong đang phát triển IoT Gateway và AMR systems với roadmap 50 năm. Là Tech Lead, bạn sẽ:\n\n1. Đánh giá current technology stack và đề xuất improvements\n2. Plan technology evolution cho 3 giai đoạn (2025-2030, 2030-2040, 2040-2075)\n3. Balance giữa innovation và stability\n4. Manage technical debt trong long-term project\n5. Align technology decisions với business objectives",
+      "time_minutes": 5,
+      "difficulty": "hard",
+      "evaluation_criteria": [
+        "Strategic thinking",
+        "Technical depth",
+        "Long-term vision",
+        "Business alignment"
+      ]
+    },
+    {
+      "id": 2,
+      "category": "Technical Leadership",
+      "question": "Team Building & Mentorship",
+      "content": "Bạn sẽ lead team 8 developers với mixed experience levels:\n\n1. Strategy để build high-performing team\n2. Approach để mentor junior developers\n3. Handle conflicts giữa senior và junior team members\n4. Create learning culture trong technical team\n5. Measure và improve team productivity",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Leadership skills",
+        "Team management",
+        "Communication",
+        "Mentoring ability"
+      ]
+    },
+    {
+      "id": 3,
+      "category": "Innovation",
+      "question": "Innovation & R&D Management",
+      "content": "Dự án cần 84 patents trong 50 năm và breakthrough features:\n\n1. Approach để identify innovation opportunities\n2. Process để evaluate và prioritize R&D projects\n3. Strategy để protect intellectual property\n4. Balance giữa research và development\n5. Measure innovation impact và ROI",
+      "time_minutes": 5,
+      "difficulty": "hard",
+      "evaluation_criteria": [
+        "Innovation mindset",
+        "R&D management",
+        "IP strategy",
+        "ROI thinking"
+      ]
+    },
+    {
+      "id": 4,
+      "category": "Risk Management",
+      "question": "Technical Risk Management",
+      "content": "Dự án gặp critical technical challenges:\n\n1. Approach để identify và assess technical risks\n2. Strategy để mitigate high-impact risks\n3. Process để handle technical emergencies\n4. Communication plan với stakeholders\n5. Lessons learned và continuous improvement",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Risk assessment",
+        "Problem solving",
+        "Crisis management",
+        "Communication"
+      ]
+    },
+    {
+      "id": 5,
+      "category": "Decision Making",
+      "question": "Technology Decision Making",
+      "content": "Cần chọn technology stack cho industrial IoT platform:\n\n1. Framework để evaluate technology options\n2. Criteria để balance technical vs business needs\n3. Process để involve team trong decision making\n4. Strategy để manage technology transitions\n5. Success metrics cho technology decisions",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Decision framework",
+        "Analytical thinking",
+        "Team involvement",
+        "Metrics-driven"
+      ]
+    },
+    {
+      "id": 6,
+      "category": "Scalability",
+      "question": "Scalability & Performance Planning",
+      "content": "System cần scale từ 100 devices lên 10,000+ devices:\n\n1. Architecture planning cho massive scale\n2. Performance optimization strategies\n3. Infrastructure planning và cost optimization\n4. Monitoring và alerting strategy\n5. Disaster recovery và business continuity",
+      "time_minutes": 5,
+      "difficulty": "hard",
+      "evaluation_criteria": [
+        "Scalability design",
+        "Performance optimization",
+        "Infrastructure planning",
+        "Business continuity"
+      ]
+    },
+    {
+      "id": 7,
+      "category": "Industry Knowledge",
+      "question": "Industrial IoT Trends",
+      "content": "Industry 4.0 và Smart Manufacturing trends:\n\n1. Current trends trong industrial IoT\n2. Emerging technologies (5G, Edge AI, Digital Twins)\n3. Competitive landscape analysis\n4. Market opportunities cho Mekong project\n5. Technology adoption strategy",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Industry knowledge",
+        "Market awareness",
+        "Technology trends",
+        "Strategic thinking"
+      ]
+    },
+    {
+      "id": 8,
+      "category": "Robotics",
+      "question": "AMR & Robotics Evolution",
+      "content": "AMR technology evolution và market dynamics:\n\n1. Current state của AMR technology\n2. Future trends trong robotics và automation\n3. Integration challenges với existing systems\n4. Safety và regulatory compliance\n5. Competitive advantages cho Mekong AMR",
+      "time_minutes": 5,
+      "difficulty": "hard",
+      "evaluation_criteria": [
+        "Robotics expertise",
+        "Market understanding",
+        "Integration knowledge",
+        "Competitive analysis"
+      ]
+    },
+    {
+      "id": 9,
+      "category": "AI Strategy",
+      "question": "Edge Computing & AI Strategy",
+      "content": "Edge AI implementation cho industrial systems:\n\n1. Edge computing architecture cho industrial IoT\n2. AI/ML strategy cho predictive maintenance\n3. Data strategy cho edge processing\n4. Integration với cloud AI services\n5. Performance optimization cho edge AI",
+      "time_minutes": 5,
+      "difficulty": "hard",
+      "evaluation_criteria": [
+        "AI/ML knowledge",
+        "Edge computing",
+        "Data strategy",
+        "Performance optimization"
+      ]
+    }
+  ],
+  "ceo_questions": [
+    {
+      "id": 1,
+      "category": "Market Understanding",
+      "question": "Market Understanding",
+      "content": "Dự án Mekong target ASEAN market với 850M USD TAM:\n\n1. Understanding của bạn về ASEAN IoT market\n2. Competitive positioning strategy\n3. Market entry approach cho different countries\n4. Partnership strategy với local players\n5. Revenue model và pricing strategy",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Market knowledge",
+        "Strategic thinking",
+        "Business development",
+        "Revenue strategy"
+      ]
+    },
+    {
+      "id": 2,
+      "category": "Business Model",
+      "question": "Business Model Innovation",
+      "content": "Dự án cần innovative business model:\n\n1. Current business model analysis\n2. Opportunities cho business model innovation\n3. Revenue diversification strategies\n4. Customer value proposition enhancement\n5. Long-term sustainability planning",
+      "time_minutes": 5,
+      "difficulty": "hard",
+      "evaluation_criteria": [
+        "Business acumen",
+        "Innovation thinking",
+        "Value proposition",
+        "Sustainability"
+      ]
+    },
+    {
+      "id": 3,
+      "category": "Growth Strategy",
+      "question": "Growth Strategy",
+      "content": "Dự án target 8% IoT market share by 2030:\n\n1. Growth strategy cho different phases\n2. Resource allocation priorities\n3. Investment strategy cho R&D và expansion\n4. Risk management cho aggressive growth\n5. Success metrics và KPIs",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Growth planning",
+        "Resource management",
+        "Investment strategy",
+        "Metrics-driven"
+      ]
+    },
+    {
+      "id": 4,
+      "category": "Leadership",
+      "question": "Leadership Philosophy",
+      "content": "Là technical leader trong growing company:\n\n1. Leadership philosophy và approach\n2. Management style và team building\n3. Conflict resolution strategies\n4. Decision-making process\n5. Personal development goals",
+      "time_minutes": 5,
+      "difficulty": "medium",
+      "evaluation_criteria": [
+        "Leadership style",
+        "Team management",
+        "Conflict resolution",
+        "Self-awareness"
+      ]
+    },
+    {
+      "id": 5,
+      "category": "Cultural Fit",
+      "question": "Cultural Alignment",
+      "content": "Company culture focus on innovation và excellence:\n\n1. Understanding về company values\n2. Personal alignment với company mission\n3. Contribution to company culture\n4. Approach to diversity và inclusion\n5. Work-life balance philosophy",
+      "time_minutes": 5,
+      "difficulty": "easy",
+      "evaluation_criteria": [
+        "Cultural fit",
+        "Value alignment",
+        "Culture contribution",
+        "Work-life balance"
+      ]
+    },
+    {
+      "id": 6,
+      "category": "Career Development",
+      "question": "Career Aspirations",
+      "content": "Long-term career development trong Mekong:\n\n1. Career goals và aspirations\n2. Personal development plan\n3. Contribution to company success\n4. Leadership development goals\n5. Work-life integration approach",
+      "time_minutes": 5,
+      "difficulty": "easy",
+      "evaluation_criteria": [
+        "Career clarity",
+        "Development mindset",
+        "Company commitment",
+        "Leadership potential"
+      ]
+    }
+  ],
+  "scoring_rubric": {
+    "excellent": {
+      "score": "9-10",
+      "criteria": [
+        "Strong technical leadership",
+        "Strategic business thinking", 
+        "Excellent communication",
+        "Cultural alignment",
+        "High growth potential"
+      ]
+    },
+    "good": {
+      "score": "7-8",
+      "criteria": [
+        "Solid technical foundation",
+        "Good business understanding",
+        "Clear communication",
+        "Good cultural fit",
+        "Growth potential"
+      ]
+    },
+    "average": {
+      "score": "5-6",
+      "criteria": [
+        "Basic technical knowledge",
+        "Some business awareness",
+        "Adequate communication",
+        "Acceptable cultural fit",
+        "Limited growth potential"
+      ]
+    },
+    "below_average": {
+      "score": "<5",
+      "criteria": [
+        "Weak technical leadership",
+        "Poor business understanding",
+        "Communication issues",
+        "Cultural misalignment",
+        "Low growth potential"
+      ]
+    }
+  },
+  "compensation_packages": {
+    "Lead Software Developer": {
+      "base_salary": {
+        "min": 10000000,
+        "max": 15000000,
+        "currency": "VND/month"
+      },
+      "performance_bonus": "1-2 months salary",
+      "stock_options": "0.5-1% after 2 years",
+      "benefits": [
+        "Healthcare insurance",
+        "Training budget 5M VND/year",
+        "Laptop and equipment",
+        "Flexible working hours",
+        "Annual company trip"
+      ]
+    },
+    "Software Engineer": {
+      "base_salary": {
+        "min": 8000000,
+        "max": 12000000,
+        "currency": "VND/month"
+      },
+      "performance_bonus": "1-2 months salary",
+      "training_budget": "10 million VND/year",
+      "benefits": [
+        "Healthcare insurance",
+        "Laptop and equipment",
+        "Flexible working hours",
+        "Career development support",
+        "Annual company trip"
+      ]
+    }
+  },
+  "interview_structure": {
+    "total_time": 75,
+    "cto_section": {
+      "time_minutes": 45,
+      "questions_to_select": 9,
+      "focus": [
+        "Technical Leadership",
+        "Strategic Thinking", 
+        "Industry Knowledge"
+      ]
+    },
+    "ceo_section": {
+      "time_minutes": 30,
+      "questions_to_select": 6,
+      "focus": [
+        "Business Understanding",
+        "Leadership & Culture",
+        "Career Development"
+      ]
+    }
+  }
+}

@@ -1,0 +1,414 @@
+{% extends "base.html" %}
+
+{% block title %}Lên lịch báo cáo - Mekong Technology{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0">
+                        <i class="fas fa-calendar-alt me-2"></i>
+                        Lên lịch báo cáo tự động
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <form method="POST" id="scheduleForm">
+                        <div class="row">
+                            <!-- Report Type Selection -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Loại báo cáo</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="report_type" class="form-label">Chọn loại báo cáo *</label>
+                                            <select class="form-select" id="report_type" name="report_type" required>
+                                                <option value="">Chọn loại báo cáo</option>
+                                                <option value="candidate_progress">Tiến độ ứng viên</option>
+                                                <option value="position_performance">Hiệu suất vị trí</option>
+                                                <option value="interviewer_performance">Hiệu suất phỏng vấn</option>
+                                                <option value="comprehensive">Báo cáo tổng hợp</option>
+                                                <option value="executive_summary">Tóm tắt điều hành</option>
+                                                <option value="funnel_analysis">Phân tích funnel</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="report_name" class="form-label">Tên báo cáo</label>
+                                            <input type="text" class="form-control" id="report_name" name="report_name" 
+                                                   placeholder="Ví dụ: Báo cáo tuyển dụng hàng tuần">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="report_description" class="form-label">Mô tả</label>
+                                            <textarea class="form-control" id="report_description" name="report_description" 
+                                                      rows="3" placeholder="Mô tả chi tiết về báo cáo này..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Schedule Configuration -->
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Cấu hình lịch</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="frequency" class="form-label">Tần suất *</label>
+                                            <select class="form-select" id="frequency" name="frequency" required>
+                                                <option value="">Chọn tần suất</option>
+                                                <option value="daily">Hàng ngày</option>
+                                                <option value="weekly">Hàng tuần</option>
+                                                <option value="monthly">Hàng tháng</option>
+                                                <option value="quarterly">Hàng quý</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3" id="weeklyOptions" style="display: none;">
+                                            <label for="weekday" class="form-label">Ngày trong tuần</label>
+                                            <select class="form-select" id="weekday" name="weekday">
+                                                <option value="1">Thứ 2</option>
+                                                <option value="2">Thứ 3</option>
+                                                <option value="3">Thứ 4</option>
+                                                <option value="4">Thứ 5</option>
+                                                <option value="5">Thứ 6</option>
+                                                <option value="6">Thứ 7</option>
+                                                <option value="0">Chủ nhật</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3" id="monthlyOptions" style="display: none;">
+                                            <label for="monthday" class="form-label">Ngày trong tháng</label>
+                                            <select class="form-select" id="monthday" name="monthday">
+                                                <option value="1">Ngày 1</option>
+                                                <option value="5">Ngày 5</option>
+                                                <option value="10">Ngày 10</option>
+                                                <option value="15">Ngày 15</option>
+                                                <option value="20">Ngày 20</option>
+                                                <option value="25">Ngày 25</option>
+                                                <option value="last">Ngày cuối tháng</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="time" class="form-label">Thời gian gửi</label>
+                                            <input type="time" class="form-control" id="time" name="time" value="09:00">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="timezone" class="form-label">Múi giờ</label>
+                                            <select class="form-select" id="timezone" name="timezone">
+                                                <option value="Asia/Ho_Chi_Minh" selected>Asia/Ho_Chi_Minh (GMT+7)</option>
+                                                <option value="UTC">UTC</option>
+                                                <option value="America/New_York">America/New_York (GMT-5)</option>
+                                                <option value="Europe/London">Europe/London (GMT+0)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recipients -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Người nhận</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="recipients" class="form-label">Email người nhận *</label>
+                                                    <textarea class="form-control" id="recipients" name="recipients" 
+                                                              rows="4" placeholder="Nhập email, mỗi dòng một email&#10;Ví dụ:&#10;hr@mekong.com&#10;manager@mekong.com" required></textarea>
+                                                    <div class="form-text">Nhập email người nhận, mỗi dòng một email</div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="cc_recipients" class="form-label">CC (tùy chọn)</label>
+                                                    <textarea class="form-control" id="cc_recipients" name="cc_recipients" 
+                                                              rows="4" placeholder="Nhập email CC, mỗi dòng một email"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="email_subject" class="form-label">Tiêu đề email</label>
+                                            <input type="text" class="form-control" id="email_subject" name="email_subject" 
+                                                   placeholder="Ví dụ: Báo cáo tuyển dụng hàng tuần - Mekong Technology">
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="email_body" class="form-label">Nội dung email</label>
+                                            <textarea class="form-control" id="email_body" name="email_body" 
+                                                      rows="4" placeholder="Nội dung email sẽ được gửi kèm báo cáo..."></textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced Options -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Tùy chọn nâng cao</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="include_charts" name="include_charts" checked>
+                                                        <label class="form-check-label" for="include_charts">
+                                                            Bao gồm biểu đồ trong báo cáo
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="include_summary" name="include_summary" checked>
+                                                        <label class="form-check-label" for="include_summary">
+                                                            Bao gồm tóm tắt thống kê
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="include_recommendations" name="include_recommendations">
+                                                        <label class="form-check-label" for="include_recommendations">
+                                                            Bao gồm khuyến nghị cải thiện
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label for="retention_days" class="form-label">Lưu trữ báo cáo (ngày)</label>
+                                                    <input type="number" class="form-control" id="retention_days" name="retention_days" 
+                                                           value="90" min="1" max="365">
+                                                    <div class="form-text">Số ngày lưu trữ báo cáo đã tạo</div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <label for="max_retries" class="form-label">Số lần thử lại tối đa</label>
+                                                    <input type="number" class="form-control" id="max_retries" name="max_retries" 
+                                                           value="3" min="1" max="10">
+                                                    <div class="form-text">Số lần thử lại nếu gửi email thất bại</div>
+                                                </div>
+                                                
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="active" name="active" checked>
+                                                        <label class="form-check-label" for="active">
+                                                            Kích hoạt lịch báo cáo
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="row mt-4">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{{ url_for('report_generation.reports_dashboard') }}" 
+                                       class="btn btn-secondary">
+                                        <i class="fas fa-arrow-left me-1"></i>Quay lại
+                                    </a>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-outline-primary" onclick="previewSchedule()">
+                                            <i class="fas fa-eye me-1"></i>Xem trước
+                                        </button>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save me-1"></i>Lưu lịch báo cáo
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xem trước lịch báo cáo</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="previewContent">
+                    <!-- Preview content will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Show/hide frequency-specific options
+document.getElementById('frequency').addEventListener('change', function() {
+    const weeklyOptions = document.getElementById('weeklyOptions');
+    const monthlyOptions = document.getElementById('monthlyOptions');
+    
+    weeklyOptions.style.display = 'none';
+    monthlyOptions.style.display = 'none';
+    
+    if (this.value === 'weekly') {
+        weeklyOptions.style.display = 'block';
+    } else if (this.value === 'monthly') {
+        monthlyOptions.style.display = 'block';
+    }
+});
+
+// Auto-generate report name based on type and frequency
+document.getElementById('report_type').addEventListener('change', function() {
+    const reportType = this.value;
+    const frequency = document.getElementById('frequency').value;
+    const reportName = document.getElementById('report_name');
+    
+    if (reportType && frequency) {
+        const typeNames = {
+            'candidate_progress': 'Tiến độ ứng viên',
+            'position_performance': 'Hiệu suất vị trí',
+            'interviewer_performance': 'Hiệu suất phỏng vấn',
+            'comprehensive': 'Báo cáo tổng hợp',
+            'executive_summary': 'Tóm tắt điều hành',
+            'funnel_analysis': 'Phân tích funnel'
+        };
+        
+        const frequencyNames = {
+            'daily': 'hàng ngày',
+            'weekly': 'hàng tuần',
+            'monthly': 'hàng tháng',
+            'quarterly': 'hàng quý'
+        };
+        
+        reportName.value = `Báo cáo ${typeNames[reportType]} ${frequencyNames[frequency]} - Mekong Technology`;
+    }
+});
+
+document.getElementById('frequency').addEventListener('change', function() {
+    // Trigger the same logic as report_type change
+    document.getElementById('report_type').dispatchEvent(new Event('change'));
+});
+
+// Preview schedule
+function previewSchedule() {
+    const form = document.getElementById('scheduleForm');
+    const formData = new FormData(form);
+    const data = {};
+    
+    for (let [key, value] of formData.entries()) {
+        data[key] = value;
+    }
+    
+    // Generate preview content
+    let previewHtml = '<div class="row">';
+    previewHtml += '<div class="col-md-6">';
+    previewHtml += '<h6>Thông tin báo cáo</h6>';
+    previewHtml += '<ul class="list-unstyled">';
+    previewHtml += `<li><strong>Loại báo cáo:</strong> ${data.report_type || 'Chưa chọn'}</li>`;
+    previewHtml += `<li><strong>Tên báo cáo:</strong> ${data.report_name || 'Chưa đặt tên'}</li>`;
+    previewHtml += `<li><strong>Tần suất:</strong> ${data.frequency || 'Chưa chọn'}</li>`;
+    previewHtml += `<li><strong>Thời gian:</strong> ${data.time || '09:00'}</li>`;
+    previewHtml += '</ul>';
+    previewHtml += '</div>';
+    
+    previewHtml += '<div class="col-md-6">';
+    previewHtml += '<h6>Người nhận</h6>';
+    previewHtml += '<ul class="list-unstyled">';
+    if (data.recipients) {
+        const recipients = data.recipients.split('\n').filter(email => email.trim());
+        recipients.forEach(email => {
+            previewHtml += `<li><i class="fas fa-envelope me-1"></i>${email.trim()}</li>`;
+        });
+    } else {
+        previewHtml += '<li class="text-muted">Chưa có người nhận</li>';
+    }
+    previewHtml += '</ul>';
+    previewHtml += '</div>';
+    previewHtml += '</div>';
+    
+    // Show modal
+    document.getElementById('previewContent').innerHTML = previewHtml;
+    const modal = new bootstrap.Modal(document.getElementById('previewModal'));
+    modal.show();
+}
+
+// Form validation
+document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+    const reportType = document.getElementById('report_type').value;
+    const frequency = document.getElementById('frequency').value;
+    const recipients = document.getElementById('recipients').value;
+    
+    if (!reportType) {
+        e.preventDefault();
+        alert('Vui lòng chọn loại báo cáo');
+        return;
+    }
+    
+    if (!frequency) {
+        e.preventDefault();
+        alert('Vui lòng chọn tần suất');
+        return;
+    }
+    
+    if (!recipients.trim()) {
+        e.preventDefault();
+        alert('Vui lòng nhập ít nhất một email người nhận');
+        return;
+    }
+    
+    // Validate email format
+    const emailList = recipients.split('\n').filter(email => email.trim());
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    for (let email of emailList) {
+        if (!emailRegex.test(email.trim())) {
+            e.preventDefault();
+            alert(`Email không hợp lệ: ${email.trim()}`);
+            return;
+        }
+    }
+});
+
+// Initialize form with default values
+document.addEventListener('DOMContentLoaded', function() {
+    // Set default time to 9 AM
+    document.getElementById('time').value = '09:00';
+    
+    // Set default retention to 90 days
+    document.getElementById('retention_days').value = '90';
+    
+    // Set default max retries to 3
+    document.getElementById('max_retries').value = '3';
+});
+</script>
+{% endblock %} 
